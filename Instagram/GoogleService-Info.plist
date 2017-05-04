@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>AD_UNIT_ID_FOR_BANNER_TEST</key>
+	<string>ca-app-pub-3940256099942544/2934735716</string>
+	<key>AD_UNIT_ID_FOR_INTERSTITIAL_TEST</key>
+	<string>ca-app-pub-3940256099942544/4411468910</string>
+	<key>CLIENT_ID</key>
+	<string>402677743639-i5o1pigrbjengvf8v1r9j759pfi7n0op.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.402677743639-i5o1pigrbjengvf8v1r9j759pfi7n0op</string>
+	<key>API_KEY</key>
+	<string>AIzaSyDNO_omQsYhhlr1yI8HMT85fEEaf4ALMm8</string>
+	<key>GCM_SENDER_ID</key>
+	<string>402677743639</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.fuadadetoro.Instagram</string>
+	<key>PROJECT_ID</key>
+	<string>igclone-6b0f7</string>
+	<key>STORAGE_BUCKET</key>
+	<string>igclone-6b0f7.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<true/>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false/>
+	<key>IS_APPINVITE_ENABLED</key>
+	<false/>
+	<key>IS_GCM_ENABLED</key>
+	<true/>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true/>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:402677743639:ios:a64d849f52d7a3be</string>
+	<key>DATABASE_URL</key>
+	<string>https://igclone-6b0f7.firebaseio.com</string>
+</dict>
+</plist>

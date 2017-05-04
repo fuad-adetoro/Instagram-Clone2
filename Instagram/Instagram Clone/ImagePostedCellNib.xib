@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="12113" systemVersion="16D32" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12078"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="ImagePostedCellNib" id="koW-hB-Z08" customClass="ImagePostedCellNib" customModule="Instagram_Clone" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="92" height="74"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                <rect key="frame" x="0.0" y="0.0" width="92" height="74"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Ote-IB-Vna">
+                        <rect key="frame" x="0.0" y="0.0" width="92" height="74"/>
+                    </imageView>
+                </subviews>
+            </view>
+            <constraints>
+                <constraint firstItem="Ote-IB-Vna" firstAttribute="height" secondItem="koW-hB-Z08" secondAttribute="height" id="LXe-0j-sgi"/>
+                <constraint firstItem="Ote-IB-Vna" firstAttribute="centerX" secondItem="koW-hB-Z08" secondAttribute="centerX" id="YPf-aP-lV7"/>
+                <constraint firstItem="Ote-IB-Vna" firstAttribute="width" secondItem="koW-hB-Z08" secondAttribute="width" id="acg-Wz-DmH"/>
+                <constraint firstItem="Ote-IB-Vna" firstAttribute="centerY" secondItem="koW-hB-Z08" secondAttribute="centerY" id="ei2-Q2-vyZ"/>
+            </constraints>
+            <size key="customSize" width="92" height="74"/>
+            <connections>
+                <outlet property="postedPicture" destination="Ote-IB-Vna" id="SxN-WS-IkE"/>
+            </connections>
+            <point key="canvasLocation" x="58" y="66"/>
+        </collectionViewCell>
+    </objects>
+</document>
