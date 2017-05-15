@@ -18,6 +18,8 @@ struct Post {
     var likes: Int!
     var userID: String!
     var username: String!
+    var hashtags: String?
+    var mentions: String?
     
     init(snapshot: FIRDataSnapshot) {
         key = snapshot.key
@@ -28,5 +30,7 @@ struct Post {
         likes = (snapshot.value as! NSDictionary)["likes"] as! Int
         userID = (snapshot.value as! NSDictionary)["userID"] as! String
         username = (snapshot.value as! NSDictionary)["username"] as! String
+        hashtags = (snapshot.value as! NSDictionary)["hashtags"] as? String
+        mentions = (snapshot.value as! NSDictionary)["mentions"] as? String
     }
 }

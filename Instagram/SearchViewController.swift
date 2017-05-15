@@ -1,112 +1,46 @@
 //
-//  SearchViewController.swift
-//  Instagram Clone
+//  TempSearchViewController.swift
+//  Instagram
 //
-//  Created by Fuad on 01/04/2017.
-//  Copyright © 2017 FuadAdetoro. All rights reserved.
+//  Created by apple  on 10/05/2017.
+//  Copyright © 2017 Instagram. All rights reserved.
 //
 
 import UIKit
-import Firebase
 
 class SearchViewController: UIViewController {
 
-    @IBOutlet weak var exploreCollectionView: UICollectionView!
-    
-    var images: [UIImage] = []
+    @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var searchBar: UISearchBar!
+    let accountService = AccountService()
+    var users: [User] = []
+    var downloadTask: URLSessionDownloadTask!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let cellNib = UINib(nibName: "ImagePostedCellNib", bundle: nil)
+        createSearchBar()
         
-        exploreCollectionView.register(cellNib, forCellWithReuseIdentifier: "ImagePostedCellNib")
-        
-        let currentUser = FIRAuth.auth()?.currentUser
-        let user = currentUser!
-        
-        exploreCollectionView.contentInset = UIEdgeInsets(top: 82, left: 0, bottom: 0, right: 0)
-        
-        captureImages(user: user)
+        tableView.tableFooterView = UIView()
+        tableView.estimatedRowHeight = 52
+        tableView.rowHeight = UITableViewAutomaticDimension
     }
     
-    func captureImages(user: FIRUser) {
-        var databaseRef: FIRDatabaseReference {
-            return FIRDatabase.database().reference()
+    func createSearchBar() {
+        let searchBar = UISearchBar()
+        searchBar.showsCancelButton = false
+        searchBar.delegate = self
+        searchBar.placeholder = "Search"
+        
+        self.navigationItem.titleView = searchBar
+    }
+    
+    
+    func search(searchText: String) {
+        accountService.searchUsers(searchText: searchText) { (foundUsers) in
+            self.users = foundUsers
+            self.tableView.reloadData()
         }
-        
-        let userData = databaseRef.child("Posts/\(user.uid)")
-        
-        userData.observe(.value, with: { snapshot in
-            print("SNAPSHOT CAPTURE: \(snapshot)")
-            for child in snapshot.children {
-                let post = Post(snapshot: child as! FIRDataSnapshot)
-                
-                if let postedPicture = post.imageURL {
-                    var storageRef: FIRStorage {
-                        return FIRStorage.storage()
-                    }
-                    
-                    storageRef.reference(forURL: postedPicture).data(withMaxSize: 5 * 1024 * 1024, completion: { (imgData, error) in
-                        if error == nil {
-                            if let data = imgData {
-                                if let imageFromData = UIImage(data: data) {
-                                    self.images.append(imageFromData)
-                                    self.exploreCollectionView.reloadData()
-                                }
-                            }
-                        }
-                    })
-                }
-            }
-        })
-    }
-
-}
-
-extension SearchViewController: UICollectionViewDataSource {
-    func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return 1
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return self.images.count
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ImagePostedCellNib", for: indexPath) as! ImagePostedCellNib
-        
-        let image = images[indexPath.row]
-        cell.configure(image: image)
-        
-        return cell
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: IndexPath) -> CGSize {
-        let layout = collectionView.collectionViewLayout as! UICollectionViewFlowLayout
-        layout.sectionInset = UIEdgeInsets(top: 3, left: 3, bottom: 3, right: 3)
-        layout.minimumInteritemSpacing = 03
-        layout.minimumLineSpacing = 03
-        layout.invalidateLayout()
-            
-        return CGSize(width: view.frame.size.width / 3 - 6, height: view.frame.size.width / 3 - 6)
-        
-    }
-    
-    // inter-spacing
-    
-    func collectionView(collectionView: UICollectionView,
-                        layout collectionViewLayout: UICollectionViewLayout,
-                        minimumInteritemSpacingForSectionAtIndex section: Int) -> CGFloat {
-        return 1.0
-    }
-    
-    // line-spacing
-    
-    func collectionView(collectionView: UICollectionView, layout
-        collectionViewLayout: UICollectionViewLayout,
-                        minimumLineSpacingForSectionAtIndex section: Int) -> CGFloat {
-        return 1.0
     }
 }
 
@@ -114,4 +48,62 @@ extension SearchViewController: UISearchBarDelegate {
     func position(for bar: UIBarPositioning) -> UIBarPosition {
         return .topAttached
     }
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        search(searchText: searchBar.text!)
+    }
 }
+
+extension SearchViewController: UITableViewDataSource {
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return 1
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return users.count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "searchResult", for: indexPath)
+        
+        let profilePicture = cell.viewWithTag(312) as! UIImageView
+        let usernameField = cell.viewWithTag(313) as! UILabel
+        let nameField = cell.viewWithTag(314) as! UILabel
+        
+        profilePicture.layer.masksToBounds = true
+        profilePicture.layer.cornerRadius = profilePicture.frame.width / 2
+        
+        let user = users[indexPath.row]
+        
+        if let photoURL = user.photoURL, let url = URL(string: photoURL) {
+            self.downloadTask = profilePicture.loadImage(url: url)
+        }
+        
+        print("blah: \(user.username!)")
+        
+        usernameField.text = user.username
+        
+        if let name = user.name {
+            nameField.isHidden = false
+            nameField.text = name
+        } else {
+            nameField.isHidden = true
+        }
+        
+        return cell
+    }
+}
+
+extension SearchViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let user = users[indexPath.row]
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        let viewUserProfileVC = storyboard.instantiateViewController(withIdentifier: "ViewUserProfile") as! ViewUserProfileViewController
+        viewUserProfileVC.user = user
+        
+        self.navigationController?.pushViewController(viewUserProfileVC, animated: true)
+        print("Selected: \(indexPath.row)")
+    }
+}
+
+

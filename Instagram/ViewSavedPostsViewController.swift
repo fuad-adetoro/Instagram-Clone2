@@ -23,9 +23,6 @@ class ViewSavedPostsViewController: UIViewController {
 
         let cellNib = UINib(nibName: "ProfilePhotoCell", bundle: nil)
         savedPostsCollectionView.register(cellNib, forCellWithReuseIdentifier: "ProfilePhotoCell")
-        print("Saved Posts: \(posts)")
-        //retrieveSavedPosts()
-        //orderPosts(posts: posts)
         
         let refreshCtrl = UIRefreshControl()
         refreshCtrl.tag = 94

@@ -22,9 +22,21 @@ struct PostService {
     
     func createPost(picture: UIImage, caption: String, user: FIRUser, completion: @escaping PostUploaded) {
         var noCaption = true
+        var hashtags: [String] = []
+        var mentions: [String] = []
         
         if !caption.isEmpty {
             noCaption = false
+            
+            let words = caption.components(separatedBy: " ")
+            
+            for word in words {
+                if word.hasPrefix("#") {
+                    hashtags.append(word)
+                } else if word.hasPrefix("@") {
+                    mentions.append(word)
+                }
+            }
         }
         
         let data = UIImageJPEGRepresentation(picture, 5 * 1024 * 1024)! as NSData
@@ -42,7 +54,7 @@ struct PostService {
             if error == nil {
                 let photoURL = newMetaData!.downloadURL()
                 self.userFromId(id: user.uid, completion: { (user) in
-                    self.createPostInDatabase(noCaption: noCaption, caption: caption, imageURL: String(describing: photoURL!), user: user, key: randomKey, timestamp: postTimestamp)
+                    self.createPostInDatabase(noCaption: noCaption, caption: caption, imageURL: String(describing: photoURL!), user: user, key: randomKey, timestamp: postTimestamp, hashtags: hashtags, mentions: mentions)
                     completion(true)
                 })
             } else {
@@ -52,13 +64,25 @@ struct PostService {
         }
     }
     
-    func createPostInDatabase(noCaption: Bool, caption: String, imageURL: String, user: User, key: String, timestamp: TimeInterval) {
+    func createPostInDatabase(noCaption: Bool, caption: String, imageURL: String, user: User, key: String, timestamp: TimeInterval, hashtags: [String], mentions: [String]) {
         let dictToUpload: [String: Any]
         
         print("timestamp: \(timestamp)")  
         
         if !noCaption {
-            dictToUpload = ["caption": caption, "imageURL": imageURL, "timestamp": timestamp, "likes": 0, "userID": user.userID!, "username": user.username!]
+            if hashtags != [] && mentions != [] {
+                let hashtagString = hashtags.joined(separator: " ")
+                let mentionString = mentions.joined(separator: " ")
+                dictToUpload = ["caption": caption, "imageURL": imageURL, "timestamp": timestamp, "likes": 0, "userID": user.userID!, "username": user.username!, "hashtags": hashtagString, "mentions": mentionString]
+            } else if hashtags != [] {
+                let hashtagString = hashtags.joined(separator: " ")
+                dictToUpload = ["caption": caption, "imageURL": imageURL, "timestamp": timestamp, "likes": 0, "userID": user.userID!, "username": user.username!, "hashtags": hashtagString]
+            } else if mentions != [] {
+                let mentionString = mentions.joined(separator: " ")
+                dictToUpload = ["caption": caption, "imageURL": imageURL, "timestamp": timestamp, "likes": 0, "userID": user.userID!, "username": user.username!, "mentions": mentionString]
+            } else {
+                dictToUpload = ["caption": caption, "imageURL": imageURL, "timestamp": timestamp, "likes": 0, "userID": user.userID!, "username": user.username!]
+            }
         } else {
             dictToUpload = ["imageURL": imageURL, "timestamp": timestamp, "likes": 0, "userID": user.userID!, "username": user.username!]
         }
@@ -260,11 +284,13 @@ struct PostService {
     
     func postComment(post: Post, comment: String, user: FIRUser) {
         let postTimestamp = Date().timeIntervalSince1970
-        let commentDict: [String: Any] = ["timestamp": postTimestamp, "userID": "\(user.uid)", "comment": comment]
+        var commentDict: [String: Any] = ["timestamp": postTimestamp, "userID": "\(user.uid)", "comment": comment]
         
         let randomKey = databaseRef.child("Posts/\(post.userID!)/\(post.key)").childByAutoId().key
         
         let commentData = databaseRef.child("Posts/\(post.userID!)/\(post.key)/comments/\(randomKey)")
+        
+        commentDict.updateValue("mentions", forKey: "")
         
         commentData.updateChildValues(commentDict) { (error, reference) in
             if error == nil {
@@ -332,15 +358,16 @@ struct PostService {
         let postData = databaseRef.child("Posts/\(post.userID!)/\(post.key)/likers/")
         
         postData.observeSingleEvent(of: .value, with: { snapshot in
-            print("The most imporznt snap: \(snapshot)")
-            var userIDs: [String] = []
-            let childSnapDict = snapshot.value as! [String: Any]
+            if snapshot.exists() {
+                var userIDs: [String] = []
+                let childSnapDict = snapshot.value as! [String: Any]
             
-            for (id, _) in childSnapDict {
-                userIDs.append(id)
+                for (id, _) in childSnapDict {
+                    userIDs.append(id)
+                }
+            
+                completion(userIDs)
             }
-            
-            completion(userIDs)
         })
     }
     
@@ -481,6 +508,42 @@ struct PostService {
                 }
             })
         }
+    }
+    
+    func fetchPosts(with hashtag: String, completion: @escaping PostsReceived) {
+        let postData = databaseRef.child("Posts/")
+        var posts: [Post] = []
+        
+        postData.observeSingleEvent(of: .value, with: { snapshot in
+            var childLoopCount = Int(snapshot.childrenCount)
+            var loopCount = 0
+            
+            for child in snapshot.children {
+                loopCount = loopCount + 1
+                print("CHild: \(child)")
+                let snap = child as! FIRDataSnapshot
+                
+                for children in snap.children {
+                    print("User Child: \(children)")
+                    let childSnap = children as! FIRDataSnapshot
+                    let childSnapDict = childSnap.value as! NSDictionary
+                    if childSnapDict["userID"] != nil {
+                        let post = Post(snapshot: children as! FIRDataSnapshot)
+                        if let hashtags = post.hashtags {
+                            if hashtags.contains(hashtag) {
+                                print("Appened Post")
+                                posts.append(post)
+                            }
+                        }
+                    }
+                }
+                
+                if loopCount == childLoopCount {
+                    print("Complete")
+                    completion(posts)
+                }
+            }
+        })
     }
 }
 

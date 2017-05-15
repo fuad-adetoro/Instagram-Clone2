@@ -112,5 +112,27 @@ struct AccountService {
         })
     }
     
+    func searchUsers(searchText: String, completion: @escaping FollowersFetched) {
+        let userData = databaseRef.child("Users/")
+        var users: [User] = []
+        
+        userData.observeSingleEvent(of: .value, with: { snapshot in
+            for child in snapshot.children {
+                let user = User(snapshot: child as! FIRDataSnapshot)
+                print("UserData: \(user.username!)")
+                let lowercasedSearchText = searchText.lowercased()
+                
+                if user.username!.contains(lowercasedSearchText) {
+                    users.append(user)
+                } else if let name = user.name, name.contains(lowercasedSearchText) {
+                    users.append(user)
+                }
+            }
+            
+            print("Users: \(users)")
+            
+            completion(users)
+        })
+    }
     
 }

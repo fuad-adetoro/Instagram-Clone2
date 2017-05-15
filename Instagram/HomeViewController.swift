@@ -85,6 +85,14 @@ class HomeViewController: UIViewController {
             activityVC.users = users
             activityVC.post = post
             activityVC.activity = .likes
+        } else if segue.identifier == "hashtagController" {
+            let hashtagVC = segue.destination as! HashtagsViewController
+            let dataDict = sender as! [String: Any]
+            let posts = dataDict["posts"] as! [Post]
+            let hashtag = dataDict["hashtag"] as! String
+            let sortedPosts = posts.sorted(by: {Date(timeIntervalSince1970: $0.timestamp!) > Date(timeIntervalSince1970: $1.timestamp!)})
+            hashtagVC.posts = sortedPosts
+            hashtagVC.hashtag = hashtag
         }
     }
     
@@ -111,52 +119,27 @@ class HomeViewController: UIViewController {
         }
     }
     
-    func myMethodToHandleTap(_ sender: UITapGestureRecognizer) {
-        let myTextView = sender.view as! UITextView
-        let text = myTextView.text!
-        let username = text.components(separatedBy: " ").first!
-        let layoutManager = myTextView.layoutManager
-        
-        // location of tap in myTextView coordinates and taking the inset into account
-        var location = sender.location(in: myTextView)
-        location.x -= myTextView.textContainerInset.left;
-        location.y -= myTextView.textContainerInset.top;
-        print("Location: \(location)")
-        
-        // character index at tap location
-        let characterIndex = layoutManager.characterIndex(for: location, in: myTextView.textContainer, fractionOfDistanceBetweenInsertionPoints: nil)
-        
-        print("charIndex: \(characterIndex)")
-        
-        // if index is valid then do something.
-        if characterIndex < myTextView.textStorage.length {
-            var range = NSRange(location: 0, length: 0)
-            if let idval = myTextView.attributedText.attribute("idnum", at: characterIndex, effectiveRange: &range) {
-                //let tappedPhrase = (myTextView.attributedText.string as NSString).substring(with: idval)
-                print("range.location = \(range.location)")
-                print("range.length = \(range.length)")
-                print("Idval: \(idval)")
-            }
-            
-            
-            print("TextView: \(myTextView.textStorage.length)")
-            if characterIndex <= username.characters.count {
-                loadProfileWithUsername(username: username)
-            } else {
-                let storyboard = UIStoryboard(name: "Main", bundle: nil)
-                let commentsVC = storyboard.instantiateViewController(withIdentifier: "DisplayComments") as! CommentsViewController
-                if let indexPath = self.profileCollectionView.indexPathForItem(at: sender.location(in: self.profileCollectionView)) {
-                    let post = posts[indexPath.row]
-                    commentsVC.post = post
-                    self.navigationController?.pushViewController(commentsVC, animated: true)
-                }
-            }
+    func presentComments(_ sender: UITapGestureRecognizer) {
+        if let indexPath = self.profileCollectionView.indexPathForItem(at: sender.location(in: self.profileCollectionView)) {
+            let storyboard = UIStoryboard(name: "Main", bundle: nil)
+            let commentsVC = storyboard.instantiateViewController(withIdentifier: "DisplayComments") as! CommentsViewController
+            let post = posts[indexPath.row]
+            commentsVC.post = post
+            self.navigationController?.pushViewController(commentsVC, animated: true)
         }
     }
     
     func loadProfileWithUsername(username: String) {
         accountService.fetchUserWithUsername(username: username) { (user) in
             self.performSegue(withIdentifier: "ViewUserProfile", sender: user)
+        }
+    }
+    
+    func loadHashtagController(hashtag: String) {
+        postService.fetchPosts(with: hashtag) { (posts) in
+            print("Segue")
+            let dataDict: [String: Any] = ["hashtag": hashtag, "posts": posts]
+            self.performSegue(withIdentifier: "hashtagController", sender: dataDict)
         }
     }
     
@@ -202,19 +185,14 @@ extension HomeViewController: UICollectionViewDataSource {
             
             let username = post.username!
             
-            /*cell.captionTextView.setText(text: "\(username) \(caption)", withHashtagColor: UIColor.blue, andMentionColor: UIColor.blue, andCallback: { (strings, type) in
-                //
-            }, normalFont: UIFont.systemFont(ofSize: 9.0), hashtagFont: UIFont.boldSystemFont(ofSize: 11), mentionFont: UIFont.boldSystemFont(ofSize: 11))*/
             cell.captionTextView.text = "\(username) \(caption)"
             cell.captionTextView.resolveHashTags()
             cell.captionTextView.sizeToFit()
             
+            let tapGesture = UITapGestureRecognizer(target: self, action: #selector(HomeViewController.presentComments(_:)))
+            tapGesture.numberOfTapsRequired = 1
+            cell.captionTextView.addGestureRecognizer(tapGesture)
             cell.captionTextView.delegate = self
-            
-            // Add tap gesture recognizer to Text View
-            //let tap = UITapGestureRecognizer(target: self, action: #selector(HomeViewController.myMethodToHandleTap(_:)))
-            //tap.numberOfTapsRequired = 1
-            //cell.captionTextView.addGestureRecognizer(tap)
             
             let likesTapped = UITapGestureRecognizer(target: self, action: #selector(HomeViewController.displayLikesController))
             likesTapped.numberOfTapsRequired = 1
@@ -233,6 +211,10 @@ extension HomeViewController: UICollectionViewDataSource {
             cell.usernameLabel.addTarget(self, action: #selector(HomeViewController.goToProfile(_:)), for: .touchUpInside)
             
             cell.configure(post: post)
+            
+            let likesTapped = UITapGestureRecognizer(target: self, action: #selector(HomeViewController.displayLikesController))
+            likesTapped.numberOfTapsRequired = 1
+            cell.likesLabel.addGestureRecognizer(likesTapped)
             
             return cell
         }
@@ -257,79 +239,20 @@ extension HomeViewController: UICollectionViewDataSource {
 }
 
 extension HomeViewController : UITextViewDelegate {
-    func showClickAlert(tagType: String, payload: String) {
-        let alertView = UIAlertController(title: tagType, message: payload, preferredStyle: .alert)
-        let action = UIAlertAction(title: "OK", style: .default, handler: nil)
-        alertView.addAction(action)
-        present(alertView, animated: true, completion: nil)
-    }
-    
     func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
         if let scheme = URL.scheme {
             switch scheme {
             case "hash":
-                print("Hashtag")
-            case "mention":
-                print("Mention")
+                let hashtag = "#\(URL.absoluteString.components(separatedBy: ":")[1])"
+                loadHashtagController(hashtag: hashtag)
+            case "mention", "username":
+                let username = URL.absoluteString.components(separatedBy: ":")[1]
+                loadProfileWithUsername(username: username)
             default:
                 print("NOrmal URL")
             }
         }
         
-        return true
+        return false
     }
-}
-
-extension UITextView {
-    
-    func resolveHashTags(){
-        
-        // turn string in to NSString
-        let nsText:NSString = self.text! as NSString!
-        
-        // this needs to be an array of NSString.  String does not work.
-        let words: [NSString] = nsText.components(separatedBy: " ") as [NSString]
-        
-        let attrs: [String: Any] = [:]
-        
-        let attrString = NSMutableAttributedString(string: nsText as String, attributes: attrs)
-        
-        // tag each word if it has a hashtag
-        for word in words {
-            
-            // found a word that is prepended by a hashtag!
-            // homework for you: implement @mentions here too.
-            if word.hasPrefix("#") {
-                
-                // a range is the character position, followed by how many characters are in the word.
-                // we need this because we staple the "href" to this range.
-                let matchRange:NSRange = nsText.range(of: word as String)
-                
-                // convert the word from NSString to String
-                // this allows us to call "dropFirst" to remove the hashtag
-                var stringifiedWord:String = word as String
-                
-                // drop the hashtag
-                stringifiedWord = String(stringifiedWord.characters.dropFirst())
-                
-                // check to see if the hashtag has numbers.
-                // ribl is "#1" shouldn't be considered a hashtag.
-                let digits = NSCharacterSet.decimalDigits
-                
-                if let numbersExist = stringifiedWord.rangeOfCharacter(from: digits) {
-                    // hashtag contains a number, like "#1" or "@1"
-                    // so don't make it clickable
-                } else {
-                    self.tintColor = UIColor.blue
-                    // set a link for when the user clicks on this word.
-                    // it's not enough to use the word "hash", but you need the url scheme syntax "hash://"
-                    // note:  since it's a URL now, the color is set to the project's tint color
-                    attrString.addAttribute(NSLinkAttributeName, value: "hash:\(stringifiedWord)", range: matchRange)
-                }
-            }
-        }
-        
-        self.attributedText = attrString
-    }
-    
 }

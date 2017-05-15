@@ -155,25 +155,10 @@ class ProfilePageViewController: UIViewController {
         performSegue(withIdentifier: "PresentComments", sender: row)
     }
     
-    func myMethodToHandleTap(_ sender: UITapGestureRecognizer, _ secondSender: AnyObject) {
-        let myTextView = sender.view as! UITextView
-        let text = myTextView.text!
-        let layoutManager = myTextView.layoutManager
-        
-        // location of tap in myTextView coordinates and taking the inset into account
-        var location = sender.location(in: myTextView)
-        location.x -= myTextView.textContainerInset.left;
-        location.y -= myTextView.textContainerInset.top;
-        
-        // character index at tap location
-        let characterIndex = layoutManager.characterIndex(for: location, in: myTextView.textContainer, fractionOfDistanceBetweenInsertionPoints: nil)
-        
-        // if index is valid then do something.
-        if characterIndex < myTextView.textStorage.length {
-            if let indexPath = self.profileCollectionView.indexPathForItem(at: sender.location(in: self.profileCollectionView)) {
-                let post = posts[indexPath.row]
-                performSegue(withIdentifier: "PresentComments", sender: post)
-            }
+    func presentComments(_ sender: UITapGestureRecognizer) {
+        if let indexPath = self.profileCollectionView.indexPathForItem(at: sender.location(in: self.profileCollectionView)) {
+            let post = posts[indexPath.row]
+            performSegue(withIdentifier: "PresentComments", sender: post)
         }
     }
     
@@ -203,6 +188,42 @@ class ProfilePageViewController: UIViewController {
         }
     }
 
+    func loadProfileWithUsername(username: String) {
+        accountService.fetchUserWithUsername(username: username) { (user) in
+            let storyboard = UIStoryboard(name: "Main", bundle: nil)
+            let profileVC = storyboard.instantiateViewController(withIdentifier: "ViewUserProfile") as! ViewUserProfileViewController
+            profileVC.user = user
+            self.navigationController?.pushViewController(profileVC, animated: true)
+        }
+    }
+    
+    func loadHashtagController(hashtag: String) {
+        postService.fetchPosts(with: hashtag) { (posts) in
+            print("Segue")
+            let dataDict: [String: Any] = ["hashtag": hashtag, "posts": posts]
+            let storyboard = UIStoryboard(name: "Main", bundle: nil)
+            let hashtagController = storyboard.instantiateViewController(withIdentifier: "hashtagController") as! HashtagsViewController
+            hashtagController.posts = posts
+            hashtagController.hashtag = hashtag
+            self.navigationController?.pushViewController(hashtagController, animated: true)
+        }
+    }
+    
+    func displayLikesController(_ sender: UITapGestureRecognizer) {
+        if let indexPath = self.profileCollectionView.indexPathForItem(at: sender.location(in: self.profileCollectionView)) {
+            let post = posts[indexPath.row]
+            postService.fetchPostLikes(post: post, completion: { (users) in
+                if !users.isEmpty {
+                    let storyboard = UIStoryboard(name: "Main", bundle: nil)
+                    let activityVC = storyboard.instantiateViewController(withIdentifier: "ActivityControl") as! ActivityViewController
+                    activityVC.users = users
+                    activityVC.activity = .likes
+                    activityVC.user = self.user!
+                    self.navigationController?.pushViewController(activityVC, animated: true)
+                }
+            })
+        }
+    }
 }
 
 extension ProfilePageViewController: UINavigationBarDelegate {
@@ -312,13 +333,18 @@ extension ProfilePageViewController: UICollectionViewDataSource {
                     
                     let username = user!.username!
                     
-                    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(ProfilePageViewController.myMethodToHandleTap(_:_:)))
+                    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(ProfilePageViewController.presentComments(_:)))
+                    tapGesture.numberOfTapsRequired = 1
                     cell.captionTextView.addGestureRecognizer(tapGesture)
                     
-                    cell.captionTextView.setText(text: "\(username) \(caption)", withHashtagColor: UIColor.blue, andMentionColor: UIColor.blue, andCallback: { (strings, type) in
-                        //
-                    }, normalFont: UIFont.systemFont(ofSize: 9.0), hashtagFont: UIFont.boldSystemFont(ofSize: 11), mentionFont: UIFont.boldSystemFont(ofSize: 11))
+                    cell.captionTextView.text = "\(username) \(caption)"
+                    cell.captionTextView.resolveHashTags()
                     cell.captionTextView.sizeToFit()
+                    cell.captionTextView.delegate = self
+                    
+                    let likesTapped = UITapGestureRecognizer(target: self, action: #selector(ProfilePageViewController.displayLikesController(_:)))
+                    likesTapped.numberOfTapsRequired = 1
+                    cell.likesLabel.addGestureRecognizer(likesTapped)
                     
                     cell.configure(post: post)
                                         
@@ -328,6 +354,10 @@ extension ProfilePageViewController: UICollectionViewDataSource {
                     
                     let commentsButton = cell.viewWithTag(2005) as! UIButton
                     commentsButton.addTarget(self, action: #selector(ProfilePageViewController.goToComments(_:)), for: .touchUpInside)
+                    
+                    let likesTapped = UITapGestureRecognizer(target: self, action: #selector(ProfilePageViewController.displayLikesController(_:)))
+                    likesTapped.numberOfTapsRequired = 1
+                    cell.likesLabel.addGestureRecognizer(likesTapped)
                                         
                     cell.configure(post: post)
                     
@@ -369,7 +399,6 @@ extension ProfilePageViewController: UICollectionViewDataSource {
                 let post = posts[indexPath.row]
                 if post.caption != nil {
                     postObject.configure(username: user!.username!, caption: post.caption!)
-                   //postObject.configure(post: post)
                     let newHeight = postObject.preferredLayoutSizeFittingSize(targetSize: CGSize(width: self.view.frame.width, height: 0)).height
                     print("new height: \(newHeight) received!")
                     return CGSize(width: self.view.frame.width, height: newHeight)
@@ -381,6 +410,25 @@ extension ProfilePageViewController: UICollectionViewDataSource {
             
         }
         
+    }
+}
+
+extension ProfilePageViewController: UITextViewDelegate {
+    func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
+        if let scheme = URL.scheme {
+            switch scheme {
+            case "hash":
+                let hashtag = "#\(URL.absoluteString.components(separatedBy: ":")[1])"
+                loadHashtagController(hashtag: hashtag)
+            case "mention":
+                let username = URL.absoluteString.components(separatedBy: ":")[1]
+                loadProfileWithUsername(username: username)
+            default:
+                print("NOrmal URL")
+            }
+        }
+        
+        return false
     }
 }
 

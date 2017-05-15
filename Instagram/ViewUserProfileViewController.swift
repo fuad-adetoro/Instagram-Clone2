@@ -88,8 +88,6 @@ class ViewUserProfileViewController: UIViewController {
         profilePostVC.user = user
         
         self.navigationController?.pushViewController(profilePostVC, animated: true)
-        
-        //ShowPost
     }
     
     func goToSavedPosts() {
@@ -152,6 +150,53 @@ class ViewUserProfileViewController: UIViewController {
                 activityVC.user = self.user!
                 self.navigationController?.pushViewController(activityVC, animated: true)
             }
+        }
+    }
+    
+    func loadProfileWithUsername(username: String) {
+        accountService.fetchUserWithUsername(username: username) { (user) in
+            let storyboard = UIStoryboard(name: "Main", bundle: nil)
+            let profileVC = storyboard.instantiateViewController(withIdentifier: "ViewUserProfile") as! ViewUserProfileViewController
+            profileVC.user = user
+            self.navigationController?.pushViewController(profileVC, animated: true)
+        }
+    }
+    
+    func loadHashtagController(hashtag: String) {
+        postService.fetchPosts(with: hashtag) { (posts) in
+            print("Segue")
+            let dataDict: [String: Any] = ["hashtag": hashtag, "posts": posts]
+            let storyboard = UIStoryboard(name: "Main", bundle: nil)
+            let hashtagController = storyboard.instantiateViewController(withIdentifier: "hashtagController") as! HashtagsViewController
+            hashtagController.posts = posts
+            hashtagController.hashtag = hashtag
+            self.navigationController?.pushViewController(hashtagController, animated: true)
+        }
+    }
+    
+    func displayLikesController(_ sender: UITapGestureRecognizer) {
+        if let indexPath = self.profileCollectionView.indexPathForItem(at: sender.location(in: self.profileCollectionView)) {
+            let post = posts[indexPath.row]
+            postService.fetchPostLikes(post: post, completion: { (users) in
+                if !users.isEmpty {
+                    let storyboard = UIStoryboard(name: "Main", bundle: nil)
+                    let activityVC = storyboard.instantiateViewController(withIdentifier: "ActivityControl") as! ActivityViewController
+                    activityVC.users = users
+                    activityVC.activity = .likes
+                    activityVC.user = self.user!
+                    self.navigationController?.pushViewController(activityVC, animated: true)
+                }
+            })
+        }
+    }
+    
+    func presentComments(_ sender: UITapGestureRecognizer) {
+        if let indexPath = self.profileCollectionView.indexPathForItem(at: sender.location(in: self.profileCollectionView)) {
+            let storyboard = UIStoryboard(name: "Main", bundle: nil)
+            let commentsVC = storyboard.instantiateViewController(withIdentifier: "DisplayComments") as! CommentsViewController
+            let post = posts[indexPath.row]
+            commentsVC.post = post
+            self.navigationController?.pushViewController(commentsVC, animated: true)
         }
     }
 }
@@ -274,13 +319,18 @@ extension ViewUserProfileViewController: UICollectionViewDataSource {
                     
                     let username = user!.username!
                     
-                    cell.captionTextView.setText(text: "\(username) \(caption)", withHashtagColor: UIColor.blue, andMentionColor: UIColor.blue, andCallback: { (strings, type) in
-                        //
-                    }, normalFont: UIFont.systemFont(ofSize: 9.0), hashtagFont: UIFont.boldSystemFont(ofSize: 11), mentionFont: UIFont.boldSystemFont(ofSize: 11))
+                    cell.captionTextView.text = "\(username) \(caption)"
+                    cell.captionTextView.resolveHashTags()
                     cell.captionTextView.sizeToFit()
+                    cell.captionTextView.delegate = self
                     
                     let tapGesture = UITapGestureRecognizer(target: self, action: #selector(ViewUserProfileViewController.goToComments(_:)))
+                    tapGesture.numberOfTapsRequired = 1
                     cell.captionTextView.addGestureRecognizer(tapGesture)
+                    
+                    let likesTapped = UITapGestureRecognizer(target: self, action: #selector(ViewUserProfileViewController.displayLikesController(_:)))
+                    likesTapped.numberOfTapsRequired = 1
+                    cell.likesLabel.addGestureRecognizer(likesTapped)
                     
                     cell.configure(post: post)
                     
@@ -290,7 +340,11 @@ extension ViewUserProfileViewController: UICollectionViewDataSource {
                     
                     let commentsButton = cell.viewWithTag(2005) as! UIButton
                     commentsButton.addTarget(self, action: #selector(ViewUserProfileViewController.goToComments(_:)), for: .touchUpInside)
-                                    
+                    
+                    let likesTapped = UITapGestureRecognizer(target: self, action: #selector(ViewUserProfileViewController.displayLikesController(_:)))
+                    likesTapped.numberOfTapsRequired = 1
+                    cell.likesLabel.addGestureRecognizer(likesTapped)
+                    
                     cell.configure(post: post)
                     
                     return cell
@@ -342,6 +396,25 @@ extension ViewUserProfileViewController: UICollectionViewDataSource {
             }
         }
         
+    }
+}
+
+extension ViewUserProfileViewController: UITextViewDelegate {
+    func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
+        if let scheme = URL.scheme {
+            switch scheme {
+            case "hash":
+                let hashtag = "#\(URL.absoluteString.components(separatedBy: ":")[1])"
+                loadHashtagController(hashtag: hashtag)
+            case "mention", "username":
+                let username = URL.absoluteString.components(separatedBy: ":")[1]
+                loadProfileWithUsername(username: username)
+            default:
+                print("NOrmal URL")
+            }
+        }
+        
+        return false
     }
 }
 

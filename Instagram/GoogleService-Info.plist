@@ -7,21 +7,21 @@
 	<key>AD_UNIT_ID_FOR_INTERSTITIAL_TEST</key>
 	<string>ca-app-pub-3940256099942544/4411468910</string>
 	<key>CLIENT_ID</key>
-	<string>402677743639-i5o1pigrbjengvf8v1r9j759pfi7n0op.apps.googleusercontent.com</string>
+	<string>256355957448-cl6ja3vkfuv1l8lhmtqdh06ta23gbdk1.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.402677743639-i5o1pigrbjengvf8v1r9j759pfi7n0op</string>
+	<string>com.googleusercontent.apps.256355957448-cl6ja3vkfuv1l8lhmtqdh06ta23gbdk1</string>
 	<key>API_KEY</key>
-	<string>AIzaSyDNO_omQsYhhlr1yI8HMT85fEEaf4ALMm8</string>
+	<string>AIzaSyDrJKdJ4CQfOfrzQrTr1XU4EMrD3_9QVTM</string>
 	<key>GCM_SENDER_ID</key>
-	<string>402677743639</string>
+	<string>256355957448</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
 	<string>com.fuadadetoro.Instagram</string>
 	<key>PROJECT_ID</key>
-	<string>igclone-6b0f7</string>
+	<string>instagram-d07f4</string>
 	<key>STORAGE_BUCKET</key>
-	<string>igclone-6b0f7.appspot.com</string>
+	<string>instagram-d07f4.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<true/>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -33,8 +33,8 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true/>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:402677743639:ios:a64d849f52d7a3be</string>
+	<string>1:256355957448:ios:a64d849f52d7a3be</string>
 	<key>DATABASE_URL</key>
-	<string>https://igclone-6b0f7.firebaseio.com</string>
+	<string>https://instagram-d07f4.firebaseio.com</string>
 </dict>
 </plist>

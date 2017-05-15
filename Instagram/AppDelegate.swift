@@ -27,9 +27,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UITabBarControllerDelegat
     }
     
     func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
-        print("Tab selected")
         if viewController == tabBarController.viewControllers![2] {
-            print("True")
             let storyboard = UIStoryboard(name: "Main", bundle: nil)
             let photoCollectionVC = storyboard.instantiateViewController(withIdentifier: "presentPhotoCol") as! UINavigationController
             tabBarController.present(photoCollectionVC, animated: true, completion: nil)

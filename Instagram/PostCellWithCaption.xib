@@ -88,7 +88,7 @@
                                     <action selector="savePost:" destination="l7C-rj-II9" eventType="touchUpInside" id="aQo-IW-URJ"/>
                                 </connections>
                             </button>
-                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" scrollEnabled="NO" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" editable="NO" text="username caption" textAlignment="natural" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nkf-Ub-RIS">
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" scrollEnabled="NO" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" editable="NO" text="username caption" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="nkf-Ub-RIS">
                                 <rect key="frame" x="6" y="420" width="363" height="80"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="10"/>
