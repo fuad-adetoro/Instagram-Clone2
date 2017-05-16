@@ -1141,6 +1141,52 @@
             </objects>
             <point key="canvasLocation" x="5229" y="2060"/>
         </scene>
+        <!--Mentions-->
+        <scene sceneID="aZD-Ff-pKz">
+            <objects>
+                <viewController storyboardIdentifier="DisplayMentions" id="rds-nh-Y6O" customClass="MentionsViewController" customModule="Instagram" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="g9U-0F-xgP"/>
+                        <viewControllerLayoutGuide type="bottom" id="4c0-bN-55L"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="MOO-YY-paa">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="nPZ-Ef-Sm4">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="93y-Do-EMU">
+                                    <size key="itemSize" width="50" height="50"/>
+                                    <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                                    <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                                    <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                </collectionViewFlowLayout>
+                                <cells/>
+                                <connections>
+                                    <outlet property="dataSource" destination="rds-nh-Y6O" id="i90-AQ-q84"/>
+                                    <outlet property="delegate" destination="rds-nh-Y6O" id="MpA-oO-8ei"/>
+                                </connections>
+                            </collectionView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="4c0-bN-55L" firstAttribute="top" secondItem="nPZ-Ef-Sm4" secondAttribute="bottom" id="2Ub-Ix-daV"/>
+                            <constraint firstItem="nPZ-Ef-Sm4" firstAttribute="top" secondItem="MOO-YY-paa" secondAttribute="top" id="85D-Oh-yvX"/>
+                            <constraint firstItem="nPZ-Ef-Sm4" firstAttribute="leading" secondItem="MOO-YY-paa" secondAttribute="leading" id="D2H-hk-ByU"/>
+                            <constraint firstAttribute="trailing" secondItem="nPZ-Ef-Sm4" secondAttribute="trailing" id="eJ8-XF-o0t"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" title="Mentions" id="mpx-3J-HHP"/>
+                    <nil key="simulatedBottomBarMetrics"/>
+                    <connections>
+                        <outlet property="collectionView" destination="nPZ-Ef-Sm4" id="deT-Rr-IZo"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="TJU-vf-VlU" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1561.875" y="5334.5070422535209"/>
+        </scene>
         <!--Home View Controller-->
         <scene sceneID="F4Q-2O-u2S">
             <objects>
@@ -1234,6 +1280,7 @@
                     </view>
                     <connections>
                         <outlet property="profileCollectionView" destination="buO-S5-veB" id="UTW-cZ-Nnh"/>
+                        <segue destination="rds-nh-Y6O" kind="show" identifier="DisplayMentions" id="7Xh-bD-OEo"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ry9-qM-7ZC" userLabel="First Responder" sceneMemberID="firstResponder"/>

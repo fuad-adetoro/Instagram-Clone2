@@ -199,6 +199,18 @@ class ViewUserProfileViewController: UIViewController {
             self.navigationController?.pushViewController(commentsVC, animated: true)
         }
     }
+    
+    func mentionPosts() {
+        if user != nil {
+            postService.usersMentionPosts(username: user!.username!, completion: { (posts) in
+                let storyboard = UIStoryboard(name: "Main", bundle: nil)
+                let mentionsVC = storyboard.instantiateViewController(withIdentifier: "DisplayMentions") as! MentionsViewController
+                mentionsVC.posts = posts
+                self.navigationController?.pushViewController(mentionsVC, animated: true)
+                print("All posts for user! \(posts)")
+            })
+        }
+    }
 }
 
 extension ViewUserProfileViewController: UICollectionViewDataSource {
@@ -260,6 +272,11 @@ extension ViewUserProfileViewController: UICollectionViewDataSource {
                 gridViewTap.numberOfTapsRequired = 1
                 gridView.addGestureRecognizer(gridViewTap)
                 
+                let mentionButton = cell.viewWithTag(1903) as! UIImageView
+                let mentionGesture = UITapGestureRecognizer(target: self, action: #selector(ViewUserProfileViewController.mentionPosts))
+                mentionGesture.numberOfTapsRequired = 1
+                mentionButton.addGestureRecognizer(mentionGesture)
+                
                 switch postMode {
                 case .gridView:
                     gridView.image = #imageLiteral(resourceName: "viewoptionone")
@@ -287,6 +304,11 @@ extension ViewUserProfileViewController: UICollectionViewDataSource {
                 let tapGesture = UITapGestureRecognizer(target: self, action: #selector(ViewUserProfileViewController.goToSavedPosts))
                 tapGesture.numberOfTapsRequired = 1
                 savedPicturesButton.addGestureRecognizer(tapGesture)
+                
+                let mentionButton = cell.viewWithTag(703) as! UIImageView
+                let mentionGesture = UITapGestureRecognizer(target: self, action: #selector(ViewUserProfileViewController.mentionPosts))
+                mentionGesture.numberOfTapsRequired = 1
+                mentionButton.addGestureRecognizer(mentionGesture)
                 
                 switch postMode {
                 case .gridView:

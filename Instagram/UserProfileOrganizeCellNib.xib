@@ -59,7 +59,7 @@
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="bh7-m5-vZr">
                                 <rect key="frame" x="216" y="0.0" width="64" height="40"/>
                                 <subviews>
-                                    <imageView contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="viewoptionthree" translatesAutoresizingMaskIntoConstraints="NO" id="QSt-XI-Asy">
+                                    <imageView tag="1903" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="viewoptionthree" translatesAutoresizingMaskIntoConstraints="NO" id="QSt-XI-Asy">
                                         <rect key="frame" x="22" y="10" width="20" height="20"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="20" id="tHm-We-vc9"/>

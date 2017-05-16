@@ -224,6 +224,18 @@ class ProfilePageViewController: UIViewController {
             })
         }
     }
+    
+    func mentionPosts() {
+        if user != nil {
+            postService.usersMentionPosts(username: user!.username!, completion: { (posts) in
+                let storyboard = UIStoryboard(name: "Main", bundle: nil)
+                let mentionsVC = storyboard.instantiateViewController(withIdentifier: "DisplayMentions") as! MentionsViewController
+                mentionsVC.posts = posts
+                self.navigationController?.pushViewController(mentionsVC, animated: true)
+                print("All posts for user! \(posts)")
+            })
+        }
+    }
 }
 
 extension ProfilePageViewController: UINavigationBarDelegate {
@@ -302,6 +314,11 @@ extension ProfilePageViewController: UICollectionViewDataSource {
             let tapGesture = UITapGestureRecognizer(target: self, action: #selector(ProfilePageViewController.savedPosts))
             tapGesture.numberOfTapsRequired = 1
             savedPicturesButton.addGestureRecognizer(tapGesture)
+            
+            let mentionButton = cell.viewWithTag(703) as! UIImageView
+            let mentionGesture = UITapGestureRecognizer(target: self, action: #selector(ProfilePageViewController.mentionPosts))
+            mentionGesture.numberOfTapsRequired = 1
+            mentionButton.addGestureRecognizer(mentionGesture)
             
             switch postMode {
             case .gridView:

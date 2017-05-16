@@ -475,7 +475,6 @@ struct PostService {
                 let childSnapDict = childSnap.value as! [String: Any]
                 print("Child Dict: \(childSnapDict)")
                 for (_, value) in childSnapDict {
-                    //let savedPosts = SavedPosts(key: key, userID: userID as! String)
                     let dataDict = value as! [String: Any]
                     if let userID = dataDict["userID"] as? String, let key = dataDict["key"] as? String {
                         loopCount = loopCount + 1
@@ -489,6 +488,39 @@ struct PostService {
         })
     }
     
+    func usersMentionPosts(username: String, completion: @escaping SavedPostsReceived) {
+        let postData = databaseRef.child("Posts/")
+        var posts: [Post] = []
+        
+        postData.observeSingleEvent(of: .value, with: { snapshot in
+            let childLoopCount = Int(snapshot.childrenCount)
+            var loopCount = 0
+            
+            for child in snapshot.children {
+                loopCount = loopCount + 1
+                let snap = child as! FIRDataSnapshot
+                
+                for children in snap.children {
+                    let childSnap = children as! FIRDataSnapshot
+                    let childSnapDict = childSnap.value as! NSDictionary
+                    if childSnapDict["userID"] != nil {
+                        let post = Post(snapshot: children as! FIRDataSnapshot)
+                        if let mentions = post.mentions {
+                            if mentions.contains("@\(username)") && mentions.characters.count == username.characters.count + 1 {
+                                print("TRUE")
+                                posts.append(post)
+                            }
+                        }
+                    }
+                }
+                
+                if loopCount == childLoopCount {
+                    completion(posts)
+                }
+            }
+        })
+    }
+    
     func fetchUsersSavedPosts(savedPosts: [SavedPosts], completion: @escaping SavedPostsReceived) {
         var loopCount = 0
         let postData = databaseRef.child("Posts/")
@@ -496,7 +528,6 @@ struct PostService {
         for post in savedPosts {
             postData.child("\(post.userID!)/\(post.key!)/").observeSingleEvent(of: .value, with: { snapshot in
                 loopCount = loopCount + 1
-                print("Important snaps: \(snapshot)")
                 let childSnapDict = snapshot.value as! NSDictionary
                 if childSnapDict["userID"] != nil {
                     let userPost = Post(snapshot: snapshot)
