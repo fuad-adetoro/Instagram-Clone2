@@ -96,6 +96,35 @@ class ViewProfilePostController: UIViewController {
             self.navigationController?.pushViewController(commentsVC, animated: true)
         }
     }
+    
+    func postOptions(_ sender: UITapGestureRecognizer) {
+        if post!.userID! == currentUser!.uid {
+            let alert = UIAlertController(title: "Delete post?", message: nil,  preferredStyle: .actionSheet)
+            let deleteAction = UIAlertAction(title: "Delete", style: .destructive, handler: { _ in
+                self.postService.deletePost(post: self.post!, completion: { (reference) in
+                    self.navigationController?.popViewController(animated: true)
+                })
+            })
+            
+            let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+            
+            alert.addAction(deleteAction)
+            alert.addAction(cancelAction)
+            
+            present(alert, animated: true, completion: nil)
+        } else {
+            let alert = UIAlertController(title: "What's up with this post?", message: nil,  preferredStyle: .actionSheet)
+            let reportAction = UIAlertAction(title: "Report", style: .default, handler: { _ in
+                self.postService.reportPost(post: self.post!, reporter: self.currentUser!.uid)
+            })
+            let cancelAction = UIAlertAction(title: "Cancel", style: .default, handler: nil)
+            
+            alert.addAction(reportAction)
+            alert.addAction(cancelAction)
+            
+            present(alert, animated: true, completion: nil)
+        }
+    }
 }
 
 extension ViewProfilePostController: UICollectionViewDataSource {
@@ -129,6 +158,10 @@ extension ViewProfilePostController: UICollectionViewDataSource {
             tapGesture.numberOfTapsRequired = 1
             cell.captionTextView.addGestureRecognizer(tapGesture)
             
+            let optionsTapped = UITapGestureRecognizer(target: self, action: #selector(ViewProfilePostController.postOptions(_:)))
+            optionsTapped.numberOfTapsRequired = 1
+            cell.optionsButton.addGestureRecognizer(optionsTapped)
+            
             cell.configure(post: post!)
             
             return cell
@@ -141,6 +174,10 @@ extension ViewProfilePostController: UICollectionViewDataSource {
             let likesTapped = UITapGestureRecognizer(target: self, action: #selector(ViewProfilePostController.displayLikesController(_:)))
             likesTapped.numberOfTapsRequired = 1
             cell.likesLabel.addGestureRecognizer(likesTapped)
+            
+            let optionsTapped = UITapGestureRecognizer(target: self, action: #selector(ViewProfilePostController.postOptions(_:)))
+            optionsTapped.numberOfTapsRequired = 1
+            cell.optionsButton.addGestureRecognizer(optionsTapped)
             
             cell.configure(post: post!)
             

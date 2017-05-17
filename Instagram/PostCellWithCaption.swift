@@ -19,6 +19,7 @@ class PostCellWithCaption: UICollectionViewCell {
     @IBOutlet weak var likesLabel: UILabel!
     @IBOutlet weak var captionTextView: UITextView!
     @IBOutlet weak var saveButton: UIButton!
+    @IBOutlet weak var optionsButton: UIButton!
     
     var collectionViewHeight: CGFloat?
     

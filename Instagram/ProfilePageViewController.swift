@@ -69,16 +69,20 @@ class ProfilePageViewController: UIViewController {
             self.navigationItem.title = user.username!
             self.user = user
             
-            self.postService.fetchPosts(user: self.currentUser!) { (userPosts) in
-                let postsSorted = userPosts.sorted(by: {Date(timeIntervalSince1970: $0.timestamp!) > Date(timeIntervalSince1970: $1.timestamp!)})
-                self.posts = postsSorted
-                if let refreshCtrl = self.view.viewWithTag(93) as? UIRefreshControl {
-                    refreshCtrl.endRefreshing()
-                }
-                DispatchQueue.main.async {
-                    self.profileCollectionView.reloadData()
-                    self.profileCollectionView.collectionViewLayout.invalidateLayout()
-                }
+            self.fetchPosts()
+        }
+    }
+    
+    func fetchPosts() {
+        self.postService.fetchPosts(user: self.currentUser!) { (userPosts) in
+            let postsSorted = userPosts.sorted(by: {Date(timeIntervalSince1970: $0.timestamp!) > Date(timeIntervalSince1970: $1.timestamp!)})
+            self.posts = postsSorted
+            if let refreshCtrl = self.view.viewWithTag(93) as? UIRefreshControl {
+                refreshCtrl.endRefreshing()
+            }
+            DispatchQueue.main.async {
+                self.profileCollectionView.reloadData()
+                self.profileCollectionView.collectionViewLayout.invalidateLayout()
             }
         }
     }
@@ -236,6 +240,31 @@ class ProfilePageViewController: UIViewController {
             })
         }
     }
+    
+    func postOptions(_ sender: UITapGestureRecognizer) {
+        if let indexPath = self.profileCollectionView.indexPathForItem(at: sender.location(in: self.profileCollectionView)) {
+            let post = posts[indexPath.row]
+            
+            let alert = UIAlertController(title: "Delete post?", message: nil,  preferredStyle: .actionSheet)
+            let deleteAction = UIAlertAction(title: "Delete", style: .destructive, handler: { (action) in
+                self.postService.deletePost(post: post, completion: { (reference) in
+                    if self.posts.count == 1 {
+                        self.posts = []
+                        self.profileCollectionView.reloadData()
+                    } else {
+                        self.fetchPosts()
+                    }
+                })
+            })
+            
+            let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+            
+            alert.addAction(deleteAction)
+            alert.addAction(cancelAction)
+            
+            present(alert, animated: true, completion: nil)
+        }
+    }
 }
 
 extension ProfilePageViewController: UINavigationBarDelegate {
@@ -363,6 +392,10 @@ extension ProfilePageViewController: UICollectionViewDataSource {
                     likesTapped.numberOfTapsRequired = 1
                     cell.likesLabel.addGestureRecognizer(likesTapped)
                     
+                    let optionsTapped = UITapGestureRecognizer(target: self, action: #selector(ProfilePageViewController.postOptions(_:)))
+                    optionsTapped.numberOfTapsRequired = 1
+                    cell.optionsButton.addGestureRecognizer(optionsTapped)
+                    
                     cell.configure(post: post)
                                         
                     return cell
@@ -375,7 +408,11 @@ extension ProfilePageViewController: UICollectionViewDataSource {
                     let likesTapped = UITapGestureRecognizer(target: self, action: #selector(ProfilePageViewController.displayLikesController(_:)))
                     likesTapped.numberOfTapsRequired = 1
                     cell.likesLabel.addGestureRecognizer(likesTapped)
-                                        
+                    
+                    let optionsTapped = UITapGestureRecognizer(target: self, action: #selector(ProfilePageViewController.postOptions(_:)))
+                    optionsTapped.numberOfTapsRequired = 1
+                    cell.optionsButton.addGestureRecognizer(optionsTapped)
+                    
                     cell.configure(post: post)
                     
                     return cell

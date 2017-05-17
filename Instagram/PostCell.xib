@@ -151,6 +151,7 @@
             <connections>
                 <outlet property="isLikedOutlet" destination="NIq-EM-bUd" id="vtW-cG-Xfs"/>
                 <outlet property="likesLabel" destination="Yda-Js-9LX" id="etZ-27-u4o"/>
+                <outlet property="optionsButton" destination="mn2-04-ZrO" id="u58-Fv-zLc"/>
                 <outlet property="postedPicture" destination="Sxi-JW-oCR" id="ZjD-fD-Ote"/>
                 <outlet property="profilePicture" destination="eoV-FM-0gX" id="3Td-Qj-XKK"/>
                 <outlet property="saveButton" destination="xoF-ud-pSc" id="Kbg-ZA-G0J"/>

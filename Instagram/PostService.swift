@@ -576,6 +576,44 @@ struct PostService {
             }
         })
     }
+    
+    typealias PostDeletion = (FIRDatabaseReference) -> Void
+    
+    func deletePost(post: Post, completion: @escaping PostDeletion) {
+        let postData = databaseRef.child("Posts/\(post.userID!)/\(post.key)/")
+        
+        postData.observeSingleEvent(of: .value, with: { snapshot in
+            if snapshot.exists() {
+                postData.removeValue(completionBlock: { (error, reference) in
+                    if error != nil {
+                        print("Error Deleting Post: \(error!.localizedDescription)")
+                    } else {
+                        completion(reference)
+                    }
+                })
+            }
+        })
+    }
+    
+    func reportPost(post: Post, reporter: String) {
+        let postData = databaseRef.child("Posts/\(post.userID!)/\(post.key)/")
+        
+        postData.observeSingleEvent(of: .value, with: { snapshot in
+            if snapshot.exists() {
+                let reportersDict: [String: String] = ["Reporter": reporter]
+                let reportersData = postData.child("Reporters/")
+                
+                
+                reportersData.updateChildValues(reportersDict, withCompletionBlock: { (error, reference) in
+                    if error != nil {
+                        print("Error Reporting Post: \(error!.localizedDescription)")
+                    } else {
+                        print("User Has Reported Post: \(reference)")
+                    }
+                })
+            }
+        })
+    }
 }
 
 

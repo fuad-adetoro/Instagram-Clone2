@@ -18,6 +18,7 @@ class PostCell: UICollectionViewCell {
     @IBOutlet weak var timePosted: UILabel!
     @IBOutlet weak var likesLabel: UILabel!
     @IBOutlet weak var saveButton: UIButton!
+    @IBOutlet weak var optionsButton: UIButton!
     
     var currentPost: Post?
     var user = FIRAuth.auth()?.currentUser

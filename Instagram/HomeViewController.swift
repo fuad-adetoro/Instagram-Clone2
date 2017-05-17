@@ -67,8 +67,6 @@ class HomeViewController: UIViewController {
                     }
                 })
             }
-                    
-            
         }
     }
     
@@ -155,7 +153,43 @@ class HomeViewController: UIViewController {
         }
     }
 
-    
+    func postOptions(_ sender: UITapGestureRecognizer) {
+        if let indexPath = self.profileCollectionView.indexPathForItem(at: sender.location(in: self.profileCollectionView)) {
+            let post = posts[indexPath.row]
+            
+            if post.userID! == currentUser!.uid {
+                let alert = UIAlertController(title: "Delete post?", message: nil,  preferredStyle: .actionSheet)
+                let deleteAction = UIAlertAction(title: "Delete", style: .destructive, handler: { _ in
+                    self.postService.deletePost(post: post, completion: { (reference) in
+                        if self.posts.count == 1 {
+                            self.posts = []
+                            self.profileCollectionView.reloadData()
+                        } else {
+                            self.fetchPosts()
+                        }
+                    })
+                })
+                
+                let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+                
+                alert.addAction(deleteAction)
+                alert.addAction(cancelAction)
+                
+                present(alert, animated: true, completion: nil)
+            } else {
+                let alert = UIAlertController(title: "What's up with this post?", message: nil,  preferredStyle: .actionSheet)
+                let reportAction = UIAlertAction(title: "Report", style: .default, handler: { _ in
+                    self.postService.reportPost(post: post, reporter: self.currentUser!.uid)
+                })
+                let cancelAction = UIAlertAction(title: "Cancel", style: .default, handler: nil)
+                
+                alert.addAction(reportAction)
+                alert.addAction(cancelAction)
+                
+                present(alert, animated: true, completion: nil)
+            }
+        }
+    }
     
 }
 
@@ -198,6 +232,10 @@ extension HomeViewController: UICollectionViewDataSource {
             likesTapped.numberOfTapsRequired = 1
             cell.likesLabel.addGestureRecognizer(likesTapped)
             
+            let optionsTapped = UITapGestureRecognizer(target: self, action: #selector(HomeViewController.postOptions(_:)))
+            optionsTapped.numberOfTapsRequired = 1
+            cell.optionsButton.addGestureRecognizer(optionsTapped)
+            
             cell.contentView.frame = cell.bounds
             cell.contentView.autoresizingMask = [.flexibleHeight]
             
@@ -215,6 +253,10 @@ extension HomeViewController: UICollectionViewDataSource {
             let likesTapped = UITapGestureRecognizer(target: self, action: #selector(HomeViewController.displayLikesController))
             likesTapped.numberOfTapsRequired = 1
             cell.likesLabel.addGestureRecognizer(likesTapped)
+            
+            let optionsTapped = UITapGestureRecognizer(target: self, action: #selector(HomeViewController.postOptions(_:)))
+            optionsTapped.numberOfTapsRequired = 1
+            cell.optionsButton.addGestureRecognizer(optionsTapped)
             
             return cell
         }

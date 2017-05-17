@@ -60,6 +60,11 @@ class ViewUserProfileViewController: UIViewController {
     
     func fetchUser() {
         self.navigationItem.title = user!.username!
+        
+        self.fetchPosts()
+    }
+    
+    func fetchPosts() {
         self.postService.fetchPosts(userID: user!.userID!) { (userPosts) in
             let postsSorted = userPosts.sorted(by: {Date(timeIntervalSince1970: $0.timestamp!) > Date(timeIntervalSince1970: $1.timestamp!)})
             self.posts = postsSorted
@@ -211,6 +216,44 @@ class ViewUserProfileViewController: UIViewController {
             })
         }
     }
+    
+    func postOptions(_ sender: UITapGestureRecognizer) {
+        if let indexPath = self.profileCollectionView.indexPathForItem(at: sender.location(in: self.profileCollectionView)) {
+            let post = posts[indexPath.row]
+            
+            if post.userID! == currentUser!.uid {
+                let alert = UIAlertController(title: "Delete post?", message: nil,  preferredStyle: .actionSheet)
+                let deleteAction = UIAlertAction(title: "Delete", style: .destructive, handler: { _ in
+                    self.postService.deletePost(post: post, completion: { (reference) in
+                        if self.posts.count == 1 {
+                            self.posts = []
+                            self.profileCollectionView.reloadData()
+                        } else {
+                            self.fetchPosts()
+                        }
+                    })
+                })
+                
+                let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+                
+                alert.addAction(deleteAction)
+                alert.addAction(cancelAction)
+                
+                present(alert, animated: true, completion: nil)
+            } else {
+                let alert = UIAlertController(title: "What's up with this post?", message: nil,  preferredStyle: .actionSheet)
+                let reportAction = UIAlertAction(title: "Report", style: .default, handler: { _ in
+                    self.postService.reportPost(post: post, reporter: self.currentUser!.uid)
+                })
+                let cancelAction = UIAlertAction(title: "Cancel", style: .default, handler: nil)
+                
+                alert.addAction(reportAction)
+                alert.addAction(cancelAction)
+                
+                present(alert, animated: true, completion: nil)
+            }
+        }
+    }
 }
 
 extension ViewUserProfileViewController: UICollectionViewDataSource {
@@ -354,6 +397,10 @@ extension ViewUserProfileViewController: UICollectionViewDataSource {
                     likesTapped.numberOfTapsRequired = 1
                     cell.likesLabel.addGestureRecognizer(likesTapped)
                     
+                    let optionsTapped = UITapGestureRecognizer(target: self, action: #selector(ProfilePageViewController.postOptions(_:)))
+                    optionsTapped.numberOfTapsRequired = 1
+                    cell.optionsButton.addGestureRecognizer(optionsTapped)
+                    
                     cell.configure(post: post)
                     
                     return cell
@@ -366,6 +413,10 @@ extension ViewUserProfileViewController: UICollectionViewDataSource {
                     let likesTapped = UITapGestureRecognizer(target: self, action: #selector(ViewUserProfileViewController.displayLikesController(_:)))
                     likesTapped.numberOfTapsRequired = 1
                     cell.likesLabel.addGestureRecognizer(likesTapped)
+                    
+                    let optionsTapped = UITapGestureRecognizer(target: self, action: #selector(ProfilePageViewController.postOptions(_:)))
+                    optionsTapped.numberOfTapsRequired = 1
+                    cell.optionsButton.addGestureRecognizer(optionsTapped)
                     
                     cell.configure(post: post)
                     

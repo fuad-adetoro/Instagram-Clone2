@@ -159,6 +159,7 @@
                 <outlet property="captionTextView" destination="nkf-Ub-RIS" id="eSk-xs-XQb"/>
                 <outlet property="isLikedOutlet" destination="YLk-fV-872" id="wuc-hk-cO7"/>
                 <outlet property="likesLabel" destination="hVv-tE-9oQ" id="OVC-0N-d1Q"/>
+                <outlet property="optionsButton" destination="eaD-8p-uRb" id="Jky-o4-9jH"/>
                 <outlet property="postedPicture" destination="nNl-2o-C8I" id="5MZ-te-9zH"/>
                 <outlet property="profilePicture" destination="TZ7-Fb-alC" id="VVs-M6-AZm"/>
                 <outlet property="saveButton" destination="sBR-2c-Vfg" id="wtr-vg-8A9"/>
