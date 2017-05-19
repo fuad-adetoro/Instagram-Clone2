@@ -6,6 +6,8 @@
 //  Copyright © 2017 FuadAdetoro. All rights reserved.
 //
 
+// IMPLEMENT NEW FIREBASE FEATURE MULTIPLE LOGGED IN USERS.
+
 import UIKit
 import Firebase
 
@@ -20,10 +22,40 @@ class ProfilePageViewController: UIViewController {
     
     @IBOutlet weak var profileCollectionView: UICollectionView!
     
+    @IBAction func logoutAction(_ sender: Any) {
+        let alert = UIAlertController(title: "Log Out?", message: "Are You Sure?", preferredStyle: .alert)
+        
+        let logoutAction = UIAlertAction(title: "Logout", style: .destructive) { _ in
+            self.authService.logUserOut(currentUser: self.currentUser, completion: { (status) in
+                if status as! Bool {
+                    let storyboard = UIStoryboard(name: "Main", bundle: nil)
+                    let loginVC = storyboard.instantiateViewController(withIdentifier: "LoginVC") as! LoginViewController
+                    
+                    self.present(loginVC, animated: true, completion: nil)
+                } else {
+                    let alert = UIAlertController(title: "Error Logging Out!", message: "There seemed to be error logging out, please try again.", preferredStyle: .alert)
+                    let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
+                    
+                    alert.addAction(okAction)
+                    
+                    self.present(alert, animated: true, completion: nil)
+                }
+            })
+        }
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        
+        alert.addAction(logoutAction)
+        alert.addAction(cancelAction)
+        
+        self.present(alert, animated: true, completion: nil)
+    }
+    
+    
     var posts: [Post] = []
     var users: [User] = []
     let postService = PostService()
     let accountService = AccountService()
+    let authService = AuthService()
     let currentUser = FIRAuth.auth()?.currentUser
     var user: User?
     

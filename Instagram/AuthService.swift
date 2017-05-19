@@ -434,4 +434,18 @@ struct AuthService {
         })
     }
     
+    typealias UserLogout = (Any) -> Void
+    
+    func logUserOut(currentUser: FIRUser?, completion: @escaping UserLogout) {
+        if currentUser != nil {
+            do {
+                try? FIRAuth.auth()?.signOut()
+                completion(true)
+            } catch let error {
+                print("Error logging out! \(error)")
+                completion(error)
+            }
+        }
+    }
+    
 }
