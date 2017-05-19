@@ -28,7 +28,7 @@ class HomeViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-                
+        
         var cellNib = UINib(nibName: "PostCell", bundle: nil)
         profileCollectionView.register(cellNib, forCellWithReuseIdentifier: "PostCell")
         

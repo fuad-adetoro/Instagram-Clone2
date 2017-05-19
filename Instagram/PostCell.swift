@@ -22,8 +22,11 @@ class PostCell: UICollectionViewCell {
     
     var currentPost: Post?
     var user = FIRAuth.auth()?.currentUser
+    
+    var downloadTask: URLSessionDownloadTask!
 
     let postService = PostService()
+    let authService = AuthService()
     
     @IBAction func savePost(_ sender: Any) {
         if currentPost != nil, user != nil {
@@ -101,35 +104,8 @@ class PostCell: UICollectionViewCell {
         
         likesLabel.text = "\(post.likes!) likes"
         
-        postService.userFromId(id: post.userID!) { (user) in
-            self.usernameLabel.setTitle(user.username!, for: .normal)
-            
-            if let profilePicture = user.photoURL {
-                storageRef.reference(forURL: profilePicture).data(withMaxSize: 5 * 1024 * 1024, completion: { (imgData, error) in
-                    if error == nil {
-                        if let image = imgData {
-                            DispatchQueue.main.async {
-                                self.profilePicture.image = UIImage(data: image)
-                            }
-                        }
-                    } else {
-                        print(error?.localizedDescription)
-                    }
-                })
-            }
-        }
-        
-        storageRef.reference(forURL: post.imageURL!).data(withMaxSize: 5 * 1024 * 1024) { (imgData, error) in
-            if error == nil {
-                if let image = imgData {
-                    DispatchQueue.main.async {
-                        self.postedPicture.image = UIImage(data: image)
-                    }
-                }
-            } else {
-                print(error?.localizedDescription)
-            }
-        }
+        setupPostedPicture(photoURL: post.imageURL!)
+        setupProfilePicture(userID: post.userID!)
         
         let date = Date(timeIntervalSince1970: post.timestamp!)
         self.timePosted.text = date.timeAgoDisplay()
@@ -143,9 +119,35 @@ class PostCell: UICollectionViewCell {
             self.isSaved = status
             self.setupInitialSaveButton()
         }
+    }
+    
+    func setupPostedPicture(photoURL: String) {
+        if let url = URL(string: photoURL) {
+            DispatchQueue.main.async {
+                self.downloadTask = self.postedPicture.loadImage(url: url)
+            }
+        }
+    }
+    
+    func setupProfilePicture(userID: String) {
+        var storageRef: FIRStorage {
+            return FIRStorage.storage()
+        }
         
-        postService.retrieveProfilePicture(userID: post.userID!) { (profilePicture) in
-            self.profilePicture.image = profilePicture
+        authService.userFromId(id: userID) { (user) in
+            if let profilePicture = user.photoURL {
+                storageRef.reference(forURL: profilePicture).data(withMaxSize: 5 * 1024 * 1024, completion: { (imgData, error) in
+                    if error == nil {
+                        if let image = imgData {
+                            DispatchQueue.main.async {
+                                self.profilePicture.image = UIImage(data: image)
+                            }
+                        }
+                    } else {
+                        print(error!.localizedDescription)
+                    }
+                })
+            }
         }
     }
     

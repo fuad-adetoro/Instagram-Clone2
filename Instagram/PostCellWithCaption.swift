@@ -9,6 +9,8 @@
 import UIKit
 import Firebase
 
+//var imageCache = NSCache()
+
 class PostCellWithCaption: UICollectionViewCell {
     
     @IBOutlet weak var profilePicture: UIImageView!
@@ -20,9 +22,7 @@ class PostCellWithCaption: UICollectionViewCell {
     @IBOutlet weak var captionTextView: UITextView!
     @IBOutlet weak var saveButton: UIButton!
     @IBOutlet weak var optionsButton: UIButton!
-    
-    var collectionViewHeight: CGFloat?
-    
+        
     var downloadTask: URLSessionDownloadTask!
 
     var currentPost: Post?
@@ -100,15 +100,6 @@ class PostCellWithCaption: UICollectionViewCell {
         self.contentView.autoresizingMask = [.flexibleHeight]
     }
     
-    func replaceTextView() {
-        /*let text = self.captionTextView.text!
-        self.captionTextView.isHidden = true
-        textView.frame = self.captionTextView.bounds
-        textView.setText(text: text, withHashtagColor: UIColor.blue, andMentionColor: UIColor.red, andCallback: { (word, type) in
-            print("Word: \(word), Type: \(type)")
-        }, normalFont: UIFont.systemFont(ofSize: 10.0), hashtagFont: UIFont.boldSystemFont(ofSize: 9.0), mentionFont: UIFont.boldSystemFont(ofSize: 9.0))*/
-    }
-    
     override var bounds: CGRect {
         didSet {
             contentView.frame = bounds
@@ -147,7 +138,6 @@ class PostCellWithCaption: UICollectionViewCell {
         
         self.captionTextView.attributedText = myString
         self.captionTextView.sizeToFit()
-        replaceTextView()
         self.updateConstraints()
     }
     
@@ -173,17 +163,15 @@ class PostCellWithCaption: UICollectionViewCell {
             self.setupInitialSaveButton()
         }
         
-        postService.retrieveProfilePicture(userID: post.userID!) { (profilePicture) in
-            self.profilePicture.image = profilePicture
-        }
-        
         self.updateConstraints()
     }
     
     func setupPostedPicture(photoURL: String) {
         if let url = URL(string: photoURL) {
-            self.downloadTask = postedPicture.loadImage(url: url)
-        }        
+            DispatchQueue.main.async {
+                self.downloadTask = self.postedPicture.loadImage(url: url)
+            }
+        }
     }
     
     func setupProfilePicture(userID: String) {
