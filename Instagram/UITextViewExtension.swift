@@ -56,28 +56,16 @@ extension UITextView {
                     attrString.addAttribute(NSFontAttributeName, value: UIFont.boldSystemFont(ofSize: 12), range: matchRange)
                 }
             } else if word.hasPrefix("@") {
-                // a range is the character position, followed by how many characters are in the word.
-                // we need this because we staple the "href" to this range.
                 let matchRange:NSRange = nsText.range(of: word as String)
-                
-                // convert the word from NSString to String
-                // this allows us to call "dropFirst" to remove the hashtag
                 var stringifiedWord:String = word as String
                 
-                // drop the hashtag
                 stringifiedWord = String(stringifiedWord.characters.dropFirst())
                 
-                // check to see if the hashtag has numbers.
-                // ribl is "#1" shouldn't be considered a hashtag.
                 let digits = NSCharacterSet.decimalDigits
                 
                 if let numbersExist = stringifiedWord.rangeOfCharacter(from: digits) {
-                    // hashtag contains a number, like "#1" or "@1"
-                    // so don't make it clickable
+                    // do nothing
                 } else {
-                    // set a link for when the user clicks on this word.
-                    // it's not enough to use the word "hash", but you need the url scheme syntax "hash://"
-                    // note:  since it's a URL now, the color is set to the project's tint color
                     attrString.addAttribute(NSLinkAttributeName, value: "mention:\(stringifiedWord)", range: matchRange)
                     attrString.addAttribute(NSFontAttributeName, value: UIFont.boldSystemFont(ofSize: 12), range: matchRange)
                 }

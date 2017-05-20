@@ -35,7 +35,10 @@ class CameraViewController: UIViewController, UITabBarDelegate {
         performSegue(withIdentifier: "SelectedPhotoVC", sender: collectedPicture!)
     }
     
+    
     func grabPhotos() {
+        
+        // Using PHImageManager to grab the user's camera roll photos
         let imgManager = PHImageManager.default()
         
         let requestOptions = PHImageRequestOptions()
@@ -43,10 +46,12 @@ class CameraViewController: UIViewController, UITabBarDelegate {
         requestOptions.deliveryMode = .highQualityFormat
         
         let fetchOptions = PHFetchOptions()
+        // Sort the picture from which was created last to first
         fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
         
         let fetchResult: PHFetchResult = PHAsset.fetchAssets(with: .image, options: fetchOptions)
         
+        // Created new images array to hold images in this scope
         var images: [UIImage] = []
         var loopCount = 0
         
@@ -55,11 +60,15 @@ class CameraViewController: UIViewController, UITabBarDelegate {
                 imgManager.requestImage(for: fetchResult.object(at: i), targetSize: CGSize(width: self.view.frame.width, height: 300), contentMode: .aspectFill, options: requestOptions, resultHandler: { image, error in
                     if let collectedPicture = image {
                         if i == 0 {
+                            // Setting the main image to be by default the first image
                             self.collectedPicture = collectedPicture
                         }
+                        
+                        // Appending to the images array in the function scope
                         images.append(collectedPicture)
                         loopCount = loopCount + 1
                         if loopCount == fetchResult.count {
+                            // if loopCount is complete then make the out-of-scope images array equal to the in-scope images array, also reload the data
                             self.images = images
                             self.collectionView.reloadData()
                         }

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0604D91B1ECFC2AE000DD3A1 /* TempCommentsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0604D91A1ECFC2AE000DD3A1 /* TempCommentsViewController.swift */; };
 		18108C071EC3299E00858E56 /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18108C061EC3299E00858E56 /* SearchViewController.swift */; };
 		182F027E1EA3F90D00696E17 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 182F027C1EA3F90D00696E17 /* Main.storyboard */; };
 		182F02831EA3F90D00696E17 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 182F02811EA3F90D00696E17 /* LaunchScreen.storyboard */; };
@@ -42,8 +43,6 @@
 		187E08C71EA50895004F5907 /* ProfileViewOneImageCellNib.xib in Resources */ = {isa = PBXBuildFile; fileRef = 187E08BA1EA50895004F5907 /* ProfileViewOneImageCellNib.xib */; };
 		187E08D11EA508FB004F5907 /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187E08C81EA508FB004F5907 /* AuthService.swift */; };
 		187E08D21EA508FB004F5907 /* Comments.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187E08C91EA508FB004F5907 /* Comments.swift */; };
-		187E08D31EA508FB004F5907 /* CustomLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187E08CA1EA508FB004F5907 /* CustomLabel.swift */; };
-		187E08D41EA508FB004F5907 /* Likers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187E08CB1EA508FB004F5907 /* Likers.swift */; };
 		187E08D51EA508FB004F5907 /* PostService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187E08CC1EA508FB004F5907 /* PostService.swift */; };
 		187E08D61EA508FB004F5907 /* StringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187E08CD1EA508FB004F5907 /* StringExtension.swift */; };
 		187E08D71EA508FB004F5907 /* UIButtonExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187E08CE1EA508FB004F5907 /* UIButtonExtension.swift */; };
@@ -83,6 +82,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0604D91A1ECFC2AE000DD3A1 /* TempCommentsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TempCommentsViewController.swift; sourceTree = "<group>"; };
 		18108C061EC3299E00858E56 /* SearchViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchViewController.swift; sourceTree = "<group>"; };
 		182F02751EA3F90D00696E17 /* Instagram.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Instagram.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		182F027D1EA3F90D00696E17 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -122,8 +122,6 @@
 		187E08BA1EA50895004F5907 /* ProfileViewOneImageCellNib.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ProfileViewOneImageCellNib.xib; sourceTree = "<group>"; };
 		187E08C81EA508FB004F5907 /* AuthService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthService.swift; sourceTree = "<group>"; };
 		187E08C91EA508FB004F5907 /* Comments.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Comments.swift; sourceTree = "<group>"; };
-		187E08CA1EA508FB004F5907 /* CustomLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomLabel.swift; sourceTree = "<group>"; };
-		187E08CB1EA508FB004F5907 /* Likers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Likers.swift; sourceTree = "<group>"; };
 		187E08CC1EA508FB004F5907 /* PostService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PostService.swift; sourceTree = "<group>"; };
 		187E08CD1EA508FB004F5907 /* StringExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StringExtension.swift; sourceTree = "<group>"; };
 		187E08CE1EA508FB004F5907 /* UIButtonExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIButtonExtension.swift; sourceTree = "<group>"; };
@@ -258,6 +256,7 @@
 				186D4A3A1EBCE57C00A894BE /* HashtagsViewController.swift */,
 				18108C061EC3299E00858E56 /* SearchViewController.swift */,
 				1894F9C51ECA532300C2AFA9 /* MentionsViewController.swift */,
+				0604D91A1ECFC2AE000DD3A1 /* TempCommentsViewController.swift */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
@@ -268,8 +267,6 @@
 				1863ABBC1EA944C500BE5576 /* AccountService.swift */,
 				187E08C81EA508FB004F5907 /* AuthService.swift */,
 				187E08C91EA508FB004F5907 /* Comments.swift */,
-				187E08CA1EA508FB004F5907 /* CustomLabel.swift */,
-				187E08CB1EA508FB004F5907 /* Likers.swift */,
 				187E08DA1EA5179E004F5907 /* Post.swift */,
 				187E08DC1EA517BE004F5907 /* DateExtension.swift */,
 				18B96ACC1EB79454007B6CBF /* UITextViewExtension.swift */,
@@ -624,12 +621,11 @@
 				1863ABBD1EA944C500BE5576 /* AccountService.swift in Sources */,
 				18108C071EC3299E00858E56 /* SearchViewController.swift in Sources */,
 				187E08A41EA50802004F5907 /* ForgotPasswordViewController.swift in Sources */,
-				187E08D31EA508FB004F5907 /* CustomLabel.swift in Sources */,
 				186D4A3B1EBCE57C00A894BE /* HashtagsViewController.swift in Sources */,
-				187E08D41EA508FB004F5907 /* Likers.swift in Sources */,
 				187E08AD1EA50853004F5907 /* AppDelegate.swift in Sources */,
 				183C177F1EABD15F00F6B833 /* ViewSavedPostsViewController.swift in Sources */,
 				187E08A01EA50802004F5907 /* SelectedPhotoViewController.swift in Sources */,
+				0604D91B1ECFC2AE000DD3A1 /* TempCommentsViewController.swift in Sources */,
 				187E08C61EA50895004F5907 /* ProfileViewOneImageCellNib.swift in Sources */,
 				187E08D91EA508FB004F5907 /* User.swift in Sources */,
 				187E08A21EA50802004F5907 /* EditProfileViewController.swift in Sources */,

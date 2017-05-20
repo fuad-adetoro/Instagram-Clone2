@@ -8,7 +8,9 @@
 
 import UIKit
 
+
 extension Date {
+    // timeAgoDisplay takes a date Interval and returns a string of the time ffrom interval
     func timeAgoDisplay() -> String {
         print("Date RIGHT NOW: \(self)")
         let secondsAgo = Int(Date().timeIntervalSince(self))
@@ -31,6 +33,8 @@ extension Date {
         return "\(secondsAgo / 60) minute ago"
     }
     
+    
+    // This function does the same as timeAgoDisplay but returns the string in a different format
     func timeSinceComment() -> String {
         
         let secondsAgo = Int(Date().timeIntervalSince(self))

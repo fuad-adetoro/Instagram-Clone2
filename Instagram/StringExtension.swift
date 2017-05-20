@@ -9,6 +9,7 @@
 import UIKit
 
 extension String {
+    // Checking if the String to see if it can be convertibable to a Integer
     var canConvertToInt: Int? {
         let canConvert = Int(self)
         return canConvert

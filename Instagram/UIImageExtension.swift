@@ -10,6 +10,7 @@ import UIKit
 import Firebase
 
 extension UIImageView {
+    // loadImage loads a image using a URL and URLSessionDownloadTask
     func loadImage(url: URL) -> URLSessionDownloadTask {
         let session = URLSession.shared
         

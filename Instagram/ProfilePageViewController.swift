@@ -65,6 +65,11 @@ class ProfilePageViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        let memoryCapacity = 500 * 1024 * 1024
+        let diskCapacity = 500 * 1024 * 1024
+        let cache = URLCache(memoryCapacity: memoryCapacity, diskCapacity: diskCapacity, diskPath: nil)
+        URLCache.shared = cache
+        
         var cellNib = UINib(nibName: "ProfileCellNib", bundle: nil)
         profileCollectionView.register(cellNib, forCellWithReuseIdentifier: "ProfileCellNib")
         

@@ -47,6 +47,7 @@ struct AuthService {
     }
     
     func saveUserInfo(user: FIRUser, email: String, username: String, phoneNumber: String?) {
+        // userInfo is the data that we will create and upload to the userData
         var userInfo: [String: Any] = [:]
         
         if let phoneNumber = phoneNumber {
@@ -55,12 +56,11 @@ struct AuthService {
             userInfo = ["userID": user.uid, "email": email.lowercased(), "username": username.lowercased()]
         }
         
-        print("\(user.email)")
-        
         let userData = databaseRef.child("Users/").child(user.uid)
         
         userData.setValue(userInfo) { (error, reference) in
             if error == nil {
+                // Updating the FIRUser's firebase display name
                 let changeRequest = user.profileChangeRequest()
                 changeRequest.displayName = username
                 print("User Details Saved Successfully!")
@@ -73,12 +73,14 @@ struct AuthService {
     func updateProfilePhoto(user: FIRUser, picture: UIImage) {
         print("updateProfilePhoto")
         let data = UIImageJPEGRepresentation(picture, 5 * 1024 * 1024)! as NSData
-            
+        
+        // Profile Picture Reference
         let imageRef = storageRef.child("ProfileImages/").child(user.uid).child("profile_picture.jpg")
         
         let metaData = FIRStorageMetadata()
         metaData.contentType = "image/jpeg"
         
+        // Updating the user's profile picture
         imageRef.put(data as Data, metadata: metaData) { (newMetaData, error) in
             if error == nil {
                 let changeRequest = user.profileChangeRequest()
@@ -120,11 +122,15 @@ struct AuthService {
     }
     
     func reupdateEmail(user: FIRUser, email: String, completion: @escaping UpdateEmail) {
+        // new email dict
         let emailUserInfo = ["email": email.lowercased()]
         
         let userData = databaseRef.child("Users/\(user.uid)")
         
+        // check if the email exists, proceed if it doesn't§
         self.emailExists(email: email) { (canUpdate) in
+            
+            // If email doesn't exist canUpdate
             if canUpdate {
                 user.updateEmail(email, completion: { (error) in
                     if let error = error as? NSError {

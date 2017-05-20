@@ -31,6 +31,7 @@ class EditProfileViewController: UITableViewController {
         self.dismiss(animated: true, completion: nil)
     }
     
+    // This function will update the user's information if it needs to be updated
     @IBAction func doneAction() {
         let newUsername = usernameField.text!
         let newDisplayName = displayNameField.text!
@@ -196,6 +197,7 @@ class EditProfileViewController: UITableViewController {
         return NSPredicate(format: "SELF MATCHES %@", urlRegEx).evaluate(with: urlString)
     }
     
+    // Created custom HeaderView for the profile picture & text being in the headerview
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         if section == 0 {
             let headerView = UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 120))

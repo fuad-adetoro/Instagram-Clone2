@@ -284,13 +284,13 @@ struct PostService {
     
     func postComment(post: Post, comment: String, user: FIRUser) {
         let postTimestamp = Date().timeIntervalSince1970
-        var commentDict: [String: Any] = ["timestamp": postTimestamp, "userID": "\(user.uid)", "comment": comment]
+        let commentDict: [String: Any] = ["timestamp": postTimestamp, "userID": "\(user.uid)", "comment": comment]
         
         let randomKey = databaseRef.child("Posts/\(post.userID!)/\(post.key)").childByAutoId().key
         
         let commentData = databaseRef.child("Posts/\(post.userID!)/\(post.key)/comments/\(randomKey)")
         
-        commentDict.updateValue("mentions", forKey: "")
+        //commentDict.updateValue("mentions", forKey: "")
         
         commentData.updateChildValues(commentDict) { (error, reference) in
             if error == nil {

@@ -17,6 +17,11 @@ class MentionsViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        let memoryCapacity = 500 * 1024 * 1024
+        let diskCapacity = 500 * 1024 * 1024
+        let cache = URLCache(memoryCapacity: memoryCapacity, diskCapacity: diskCapacity, diskPath: nil)
+        URLCache.shared = cache
+        
         let cellNib = UINib(nibName: "ProfilePhotoCell", bundle: nil)
         collectionView.register(cellNib, forCellWithReuseIdentifier: "ProfilePhotoCell")
 

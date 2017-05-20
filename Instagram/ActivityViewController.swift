@@ -33,6 +33,11 @@ class ActivityViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        let memoryCapacity = 500 * 1024 * 1024
+        let diskCapacity = 500 * 1024 * 1024
+        let cache = URLCache(memoryCapacity: memoryCapacity, diskCapacity: diskCapacity, diskPath: nil)
+        URLCache.shared = cache
+        
         tableView.tableFooterView = UIView()
         tableView.estimatedRowHeight = 35
         tableView.rowHeight = UITableViewAutomaticDimension

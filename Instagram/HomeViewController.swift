@@ -24,10 +24,16 @@ class HomeViewController: UIViewController {
     var profilePicURL: String?
     let currentUser = FIRAuth.auth()?.currentUser
     
+    // Loading "PostCellWithCaption" nib to postCellCaptionNib and forcing it to be an NSArray
     let postCellCaptionNib = Bundle.main.loadNibNamed("PostCellWithCaption", owner: PostCellWithCaption.self, options: nil)! as NSArray
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        let memoryCapacity = 500 * 1024 * 1024
+        let diskCapacity = 500 * 1024 * 1024
+        let cache = URLCache(memoryCapacity: memoryCapacity, diskCapacity: diskCapacity, diskPath: nil)
+        URLCache.shared = cache
         
         var cellNib = UINib(nibName: "PostCell", bundle: nil)
         profileCollectionView.register(cellNib, forCellWithReuseIdentifier: "PostCell")
@@ -39,6 +45,7 @@ class HomeViewController: UIViewController {
         
         fetchPosts()
         
+        // Creating refresh control to refresh the data displayed.
         let refreshCtrl = UIRefreshControl()
         refreshCtrl.tag = 92
         refreshCtrl.addTarget(self, action: #selector(HomeViewController.fetchPosts) , for: .valueChanged)

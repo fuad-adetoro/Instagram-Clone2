@@ -13,6 +13,7 @@ class CommentsViewController: UIViewController {
 
     let postService = PostService()
     let authService = AuthService()
+    let accountService = AccountService()
     
     var downloadTask: URLSessionDownloadTask!
     
@@ -26,11 +27,14 @@ class CommentsViewController: UIViewController {
     @IBOutlet weak var tableView: UITableView!
     
     @IBAction func postComment(_ sender: Any) {
+        // Comment posted
         postService.postComment(post: post!, comment: commentTextField.text!, user: currentUser!)
     }
     
     func fetchComments() {
+        // Fetching comments for post
         postService.fetchComments(post: post!) { (comments) in
+            // Sorting the comments based of the comment's post timestamp
             let sortedComments = comments.sorted(by: {Date(timeIntervalSince1970: $0.timestamp!) > Date(timeIntervalSince1970: $1.timestamp!)})
             self.comments = sortedComments
             self.tableView.reloadData()
@@ -41,10 +45,15 @@ class CommentsViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // Increased Cache capacity to store images up to 500MB
+        let memoryCapacity = 500 * 1024 * 1024
+        let diskCapacity = 500 * 1024 * 1024
+        let cache = URLCache(memoryCapacity: memoryCapacity, diskCapacity: diskCapacity, diskPath: nil)
+        URLCache.shared = cache
 
+        // If the table view doesn't have enough rows remove the extra footer lines if the rows don't exist
         tableView.tableFooterView = UIView()
-        tableView.rowHeight = UITableViewAutomaticDimension
-        tableView.estimatedRowHeight = 80
         
         NotificationCenter.default.addObserver(self, selector: #selector(CommentsViewController.keyboardWillShow(_:)), name: .UIKeyboardWillShow, object: nil)
         
@@ -52,8 +61,11 @@ class CommentsViewController: UIViewController {
     }
     
     func keyboardWillShow(_ notification: NSNotification) {
+        // When the keyboard is shown we will determine the height based of the keyboard size, we will then add that to a local variable which will be used to animate the view up.
         if let keyboardSize = (notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
             self.keyboardHeight = keyboardSize.height
+            
+            self.tableView.rowHeight = UITableViewAutomaticDimension
         }
     }
     
@@ -68,16 +80,39 @@ class CommentsViewController: UIViewController {
             self.view.frame.origin.y += value
         }
     }
+    
+    func loadProfileWithUsername(username: String) {
+        accountService.fetchUserWithUsername(username: username) { (user) in
+            let storyboard = UIStoryboard(name: "Main", bundle: nil)
+            let profileVC = storyboard.instantiateViewController(withIdentifier: "ViewUserProfile") as! ViewUserProfileViewController
+            profileVC.user = user
+            self.navigationController?.pushViewController(profileVC, animated: true)
+        }
+    }
+    
+    func loadHashtagController(hashtag: String) {
+        postService.fetchPosts(with: hashtag) { (posts) in
+            print("Segue")
+            let dataDict: [String: Any] = ["hashtag": hashtag, "posts": posts]
+            let storyboard = UIStoryboard(name: "Main", bundle: nil)
+            let hashtagController = storyboard.instantiateViewController(withIdentifier: "hashtagController") as! HashtagsViewController
+            hashtagController.posts = posts
+            hashtagController.hashtag = hashtag
+            self.navigationController?.pushViewController(hashtagController, animated: true)
+        }
+    }
 }
 
 extension CommentsViewController: UITextFieldDelegate {
     func textFieldDidBeginEditing(_ textField: UITextField) {
         textField.becomeFirstResponder()
+        // Animate the view up when the keyboard is shown by the keyboardHeight
         animateViewUp(by: keyboardHeight)
     }
     
     func textFieldDidEndEditing(_ textField: UITextField) {
         textField.resignFirstResponder()
+        // Animate the view down by the keyboard height when the keyboard is being dimissed
         animateViewDown(by: keyboardHeight)
     }
     
@@ -115,6 +150,7 @@ extension CommentsViewController: UITableViewDataSource {
             let captionTextView = cell.viewWithTag(402) as! UITextView
             captionTextView.textContainer.lineFragmentPadding = 0
             captionTextView.textContainerInset = UIEdgeInsets.zero
+            captionTextView.delegate = self
             captionTextView.resolveHashTags()
             
             authService.userFromId(id: post.userID!, completion: { (user) in
@@ -141,6 +177,8 @@ extension CommentsViewController: UITableViewDataSource {
             let messageView = cell.viewWithTag(502) as! UITextView
             messageView.textContainer.lineFragmentPadding = 0
             messageView.textContainerInset = UIEdgeInsets.zero
+            messageView.delegate = self
+            messageView.resolveHashTags()
             
             let date = Date(timeIntervalSince1970: comment.timestamp!)
             let timeLabel = cell.viewWithTag(503) as! UILabel
@@ -149,8 +187,10 @@ extension CommentsViewController: UITableViewDataSource {
             authService.userFromId(id: comment.userID!, completion: { (user) in
                 let username = user.username!
                 let message = comment.comment!
-                messageView.text = "\(username) \(message)"
-                messageView.sizeToFit()
+                DispatchQueue.main.async {
+                    messageView.text = "\(username) \(message)"
+                    messageView.sizeToFit()
+                }
                 if let photoURL = user.photoURL, let url = URL(string: photoURL) {
                     self.downloadTask = profilePicture.loadImage(url: url)
                 }
@@ -158,5 +198,61 @@ extension CommentsViewController: UITableViewDataSource {
             
             return cell
         }
+    }
+    
+    func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+        if indexPath.section == 0 {
+            return UITableViewAutomaticDimension
+        } else {
+            //let postObject = commentsCaption.object(at: 0) as! CommentsCell
+            
+            //let newHeight = postObject.contentView.frame.height
+            
+            let newCommentView = CommentsCell.init(style: .default, reuseIdentifier: "CommentsComments")
+            let comment = comments[indexPath.row]
+            newCommentView.captionTextView.text = "\(comment)"
+        
+            let newHeight = newCommentView.contentView.frame.height
+            
+            if newHeight == 0 {
+                return UITableViewAutomaticDimension
+            } else {
+                return newHeight + 15
+            }
+        }
+    }
+}
+
+extension CommentsViewController : UITextViewDelegate {
+    func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
+        if let scheme = URL.scheme {
+            switch scheme {
+            case "hash":
+                let hashtag = "#\(URL.absoluteString.components(separatedBy: ":")[1])"
+                loadHashtagController(hashtag: hashtag)
+            case "mention", "username":
+                let username = URL.absoluteString.components(separatedBy: ":")[1]
+                loadProfileWithUsername(username: username)
+            default:
+                print("NOrmal URL")
+            }
+        }
+        
+        return false
+    }
+}
+
+class CommentsCell: UITableViewCell {
+    
+    @IBOutlet weak var profilePictureView: UIImageView!
+    @IBOutlet weak var captionTextView: UITextView!
+    @IBOutlet weak var timePostedLabel: UILabel!
+    
+    @IBAction func replyToComment(_ sender: Any) {
+        
+    }
+        
+    override func awakeFromNib() {
+        // Awake
     }
 }
