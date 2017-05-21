@@ -7,7 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0604D91B1ECFC2AE000DD3A1 /* TempCommentsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0604D91A1ECFC2AE000DD3A1 /* TempCommentsViewController.swift */; };
+		0639C1081ED0E1030061D68D /* user-placeholder.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 0639C1071ED0E1030061D68D /* user-placeholder.jpg */; };
+		0639C10A1ED0E80E0061D68D /* CommentsCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0639C1091ED0E80E0061D68D /* CommentsCell.xib */; };
 		18108C071EC3299E00858E56 /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18108C061EC3299E00858E56 /* SearchViewController.swift */; };
 		182F027E1EA3F90D00696E17 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 182F027C1EA3F90D00696E17 /* Main.storyboard */; };
 		182F02831EA3F90D00696E17 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 182F02811EA3F90D00696E17 /* LaunchScreen.storyboard */; };
@@ -42,7 +43,7 @@
 		187E08C61EA50895004F5907 /* ProfileViewOneImageCellNib.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187E08B91EA50895004F5907 /* ProfileViewOneImageCellNib.swift */; };
 		187E08C71EA50895004F5907 /* ProfileViewOneImageCellNib.xib in Resources */ = {isa = PBXBuildFile; fileRef = 187E08BA1EA50895004F5907 /* ProfileViewOneImageCellNib.xib */; };
 		187E08D11EA508FB004F5907 /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187E08C81EA508FB004F5907 /* AuthService.swift */; };
-		187E08D21EA508FB004F5907 /* Comments.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187E08C91EA508FB004F5907 /* Comments.swift */; };
+		187E08D21EA508FB004F5907 /* Comment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187E08C91EA508FB004F5907 /* Comment.swift */; };
 		187E08D51EA508FB004F5907 /* PostService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187E08CC1EA508FB004F5907 /* PostService.swift */; };
 		187E08D61EA508FB004F5907 /* StringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187E08CD1EA508FB004F5907 /* StringExtension.swift */; };
 		187E08D71EA508FB004F5907 /* UIButtonExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187E08CE1EA508FB004F5907 /* UIButtonExtension.swift */; };
@@ -51,7 +52,6 @@
 		187E08DB1EA5179E004F5907 /* Post.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187E08DA1EA5179E004F5907 /* Post.swift */; };
 		187E08DD1EA517BE004F5907 /* DateExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187E08DC1EA517BE004F5907 /* DateExtension.swift */; };
 		187E08DF1EA5182F004F5907 /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187E08DE1EA5182F004F5907 /* HomeViewController.swift */; };
-		187E08E11EA518FE004F5907 /* user-placeholder.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 187E08E01EA518FE004F5907 /* user-placeholder.jpg */; };
 		1894F9C61ECA532300C2AFA9 /* MentionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1894F9C51ECA532300C2AFA9 /* MentionsViewController.swift */; };
 		1894F9CC1ECC98DE00C2AFA9 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 1894F9CB1ECC98DE00C2AFA9 /* GoogleService-Info.plist */; };
 		18B96ACB1EB14E06007B6CBF /* ActivityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18B96ACA1EB14E06007B6CBF /* ActivityViewController.swift */; };
@@ -82,7 +82,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		0604D91A1ECFC2AE000DD3A1 /* TempCommentsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TempCommentsViewController.swift; sourceTree = "<group>"; };
+		0639C1071ED0E1030061D68D /* user-placeholder.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "user-placeholder.jpg"; sourceTree = "<group>"; };
+		0639C1091ED0E80E0061D68D /* CommentsCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CommentsCell.xib; sourceTree = "<group>"; };
 		18108C061EC3299E00858E56 /* SearchViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchViewController.swift; sourceTree = "<group>"; };
 		182F02751EA3F90D00696E17 /* Instagram.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Instagram.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		182F027D1EA3F90D00696E17 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -121,7 +122,7 @@
 		187E08B91EA50895004F5907 /* ProfileViewOneImageCellNib.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileViewOneImageCellNib.swift; sourceTree = "<group>"; };
 		187E08BA1EA50895004F5907 /* ProfileViewOneImageCellNib.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ProfileViewOneImageCellNib.xib; sourceTree = "<group>"; };
 		187E08C81EA508FB004F5907 /* AuthService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthService.swift; sourceTree = "<group>"; };
-		187E08C91EA508FB004F5907 /* Comments.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Comments.swift; sourceTree = "<group>"; };
+		187E08C91EA508FB004F5907 /* Comment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Comment.swift; sourceTree = "<group>"; };
 		187E08CC1EA508FB004F5907 /* PostService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PostService.swift; sourceTree = "<group>"; };
 		187E08CD1EA508FB004F5907 /* StringExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StringExtension.swift; sourceTree = "<group>"; };
 		187E08CE1EA508FB004F5907 /* UIButtonExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIButtonExtension.swift; sourceTree = "<group>"; };
@@ -130,7 +131,6 @@
 		187E08DA1EA5179E004F5907 /* Post.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Post.swift; sourceTree = "<group>"; };
 		187E08DC1EA517BE004F5907 /* DateExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DateExtension.swift; sourceTree = "<group>"; };
 		187E08DE1EA5182F004F5907 /* HomeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = HomeViewController.swift; sourceTree = "<group>"; };
-		187E08E01EA518FE004F5907 /* user-placeholder.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "user-placeholder.jpg"; sourceTree = "<group>"; };
 		1894F9C51ECA532300C2AFA9 /* MentionsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MentionsViewController.swift; sourceTree = "<group>"; };
 		1894F9CB1ECC98DE00C2AFA9 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		18B96ACA1EB14E06007B6CBF /* ActivityViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActivityViewController.swift; sourceTree = "<group>"; };
@@ -207,6 +207,7 @@
 				182F02841EA3F90D00696E17 /* Info.plist */,
 				182F02811EA3F90D00696E17 /* LaunchScreen.storyboard */,
 				182F027C1EA3F90D00696E17 /* Main.storyboard */,
+				0639C1071ED0E1030061D68D /* user-placeholder.jpg */,
 				1894F9CB1ECC98DE00C2AFA9 /* GoogleService-Info.plist */,
 			);
 			path = Instagram;
@@ -229,6 +230,7 @@
 				187E08B91EA50895004F5907 /* ProfileViewOneImageCellNib.swift */,
 				187E08BA1EA50895004F5907 /* ProfileViewOneImageCellNib.xib */,
 				18C18A601EAB08D400D30708 /* UserProfileOrganizeCellNib.xib */,
+				0639C1091ED0E80E0061D68D /* CommentsCell.xib */,
 			);
 			name = Cells;
 			sourceTree = "<group>";
@@ -256,7 +258,6 @@
 				186D4A3A1EBCE57C00A894BE /* HashtagsViewController.swift */,
 				18108C061EC3299E00858E56 /* SearchViewController.swift */,
 				1894F9C51ECA532300C2AFA9 /* MentionsViewController.swift */,
-				0604D91A1ECFC2AE000DD3A1 /* TempCommentsViewController.swift */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
@@ -266,7 +267,7 @@
 			children = (
 				1863ABBC1EA944C500BE5576 /* AccountService.swift */,
 				187E08C81EA508FB004F5907 /* AuthService.swift */,
-				187E08C91EA508FB004F5907 /* Comments.swift */,
+				187E08C91EA508FB004F5907 /* Comment.swift */,
 				187E08DA1EA5179E004F5907 /* Post.swift */,
 				187E08DC1EA517BE004F5907 /* DateExtension.swift */,
 				18B96ACC1EB79454007B6CBF /* UITextViewExtension.swift */,
@@ -275,7 +276,6 @@
 				187E08CD1EA508FB004F5907 /* StringExtension.swift */,
 				187E08CE1EA508FB004F5907 /* UIButtonExtension.swift */,
 				187E08CF1EA508FB004F5907 /* UIImageExtension.swift */,
-				187E08E01EA518FE004F5907 /* user-placeholder.jpg */,
 				187E08D01EA508FB004F5907 /* User.swift */,
 			);
 			name = Extra;
@@ -429,14 +429,15 @@
 				182F02831EA3F90D00696E17 /* LaunchScreen.storyboard in Resources */,
 				187E08BE1EA50895004F5907 /* PostCell.xib in Resources */,
 				187E08C71EA50895004F5907 /* ProfileViewOneImageCellNib.xib in Resources */,
-				187E08E11EA518FE004F5907 /* user-placeholder.jpg in Resources */,
 				187E08C01EA50895004F5907 /* PostCellWithCaption.xib in Resources */,
 				187E08C21EA50895004F5907 /* ProfileCellNib.xib in Resources */,
 				18C18A611EAB08D500D30708 /* UserProfileOrganizeCellNib.xib in Resources */,
 				187E08C31EA50895004F5907 /* ProfileOrganizeCellNib.xib in Resources */,
 				187E08BC1EA50895004F5907 /* ImagePostedCellNib.xib in Resources */,
+				0639C1081ED0E1030061D68D /* user-placeholder.jpg in Resources */,
 				18EE458A1EA573790004768C /* Assets.xcassets in Resources */,
 				182F027E1EA3F90D00696E17 /* Main.storyboard in Resources */,
+				0639C10A1ED0E80E0061D68D /* CommentsCell.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -625,7 +626,6 @@
 				187E08AD1EA50853004F5907 /* AppDelegate.swift in Sources */,
 				183C177F1EABD15F00F6B833 /* ViewSavedPostsViewController.swift in Sources */,
 				187E08A01EA50802004F5907 /* SelectedPhotoViewController.swift in Sources */,
-				0604D91B1ECFC2AE000DD3A1 /* TempCommentsViewController.swift in Sources */,
 				187E08C61EA50895004F5907 /* ProfileViewOneImageCellNib.swift in Sources */,
 				187E08D91EA508FB004F5907 /* User.swift in Sources */,
 				187E08A21EA50802004F5907 /* EditProfileViewController.swift in Sources */,
@@ -633,7 +633,7 @@
 				187E08DB1EA5179E004F5907 /* Post.swift in Sources */,
 				187E08D51EA508FB004F5907 /* PostService.swift in Sources */,
 				187E08D71EA508FB004F5907 /* UIButtonExtension.swift in Sources */,
-				187E08D21EA508FB004F5907 /* Comments.swift in Sources */,
+				187E08D21EA508FB004F5907 /* Comment.swift in Sources */,
 				187E08A31EA50802004F5907 /* FirstSignUpViewController.swift in Sources */,
 				187E08A71EA50802004F5907 /* ProfilePageViewController.swift in Sources */,
 				187E08BD1EA50895004F5907 /* PostCell.swift in Sources */,

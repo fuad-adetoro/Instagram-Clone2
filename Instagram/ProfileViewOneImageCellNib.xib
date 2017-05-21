@@ -11,23 +11,23 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
-        <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="ProfileViewOneImageCellNib" id="H7h-Xk-OTl">
+        <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="ProfileViewOneImageCellNib" id="iir-kL-GTR">
             <rect key="frame" x="0.0" y="0.0" width="118" height="133"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
                 <rect key="frame" x="0.0" y="0.0" width="118" height="133"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Jf5-IJ-mxF">
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="mgp-VE-AgX">
                         <rect key="frame" x="0.0" y="-0.5" width="118" height="133"/>
                     </imageView>
                 </subviews>
             </view>
             <constraints>
-                <constraint firstItem="Jf5-IJ-mxF" firstAttribute="centerY" secondItem="H7h-Xk-OTl" secondAttribute="centerY" id="EGh-YP-9AJ"/>
-                <constraint firstItem="Jf5-IJ-mxF" firstAttribute="height" secondItem="H7h-Xk-OTl" secondAttribute="height" id="NvE-eO-VO1"/>
-                <constraint firstItem="Jf5-IJ-mxF" firstAttribute="centerX" secondItem="H7h-Xk-OTl" secondAttribute="centerX" id="pVm-Wv-hvC"/>
-                <constraint firstItem="Jf5-IJ-mxF" firstAttribute="width" secondItem="H7h-Xk-OTl" secondAttribute="width" id="vum-Uf-8tc"/>
+                <constraint firstItem="mgp-VE-AgX" firstAttribute="centerY" secondItem="iir-kL-GTR" secondAttribute="centerY" id="Vkh-Ow-LeV"/>
+                <constraint firstItem="mgp-VE-AgX" firstAttribute="width" secondItem="iir-kL-GTR" secondAttribute="width" id="Xhp-Nu-j9e"/>
+                <constraint firstItem="mgp-VE-AgX" firstAttribute="height" secondItem="iir-kL-GTR" secondAttribute="height" id="aMc-fv-4hG"/>
+                <constraint firstItem="mgp-VE-AgX" firstAttribute="centerX" secondItem="iir-kL-GTR" secondAttribute="centerX" id="cHw-u9-Kn2"/>
             </constraints>
         </collectionViewCell>
     </objects>

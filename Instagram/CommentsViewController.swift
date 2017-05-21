@@ -21,23 +21,44 @@ class CommentsViewController: UIViewController {
     
     var post: Post!
     let currentUser = FIRAuth.auth()?.currentUser
-    var comments: [Comments] = []
+    var comments: [Comment] = []
     
     @IBOutlet weak var postOutlet: UIButton!
     @IBOutlet weak var tableView: UITableView!
     
     @IBAction func postComment(_ sender: Any) {
         // Comment posted
-        postService.postComment(post: post!, comment: commentTextField.text!, user: currentUser!)
+        let comment = commentTextField.text!
+        
+        if comment != "" {
+            postService.postComment(post: post!, comment: comment, user: currentUser!) { _ in
+                self.commentTextField.text = ""
+                self.dismissKeyboard()
+                self.fetchComments()
+            }
+        } else {
+            let alert = UIAlertController(title: "Error!", message: "You cannot submit an empty comment.", preferredStyle: .alert)
+            let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
+            
+            alert.addAction(okAction)
+            
+            self.present(alert, animated: true, completion: nil)
+        }
+    }
+    
+    func dismissKeyboard() {
+        self.view.endEditing(true)
     }
     
     func fetchComments() {
         // Fetching comments for post
         postService.fetchComments(post: post!) { (comments) in
             // Sorting the comments based of the comment's post timestamp
-            let sortedComments = comments.sorted(by: {Date(timeIntervalSince1970: $0.timestamp!) > Date(timeIntervalSince1970: $1.timestamp!)})
-            self.comments = sortedComments
-            self.tableView.reloadData()
+            let sortedComments = comments.sorted(by: {Date(timeIntervalSince1970: $0.timestamp!) < Date(timeIntervalSince1970: $1.timestamp!)})
+            DispatchQueue.main.async {
+                self.comments = sortedComments
+                self.tableView.reloadData()
+            }
         }
     }
     
@@ -52,20 +73,27 @@ class CommentsViewController: UIViewController {
         let cache = URLCache(memoryCapacity: memoryCapacity, diskCapacity: diskCapacity, diskPath: nil)
         URLCache.shared = cache
 
-        // If the table view doesn't have enough rows remove the extra footer lines if the rows don't exist
-        tableView.tableFooterView = UIView()
+        let cellNib = UINib(nibName: "CommentsCell", bundle: nil)
+        self.tableView.register(cellNib, forCellReuseIdentifier: "CommentsCell")
         
         NotificationCenter.default.addObserver(self, selector: #selector(CommentsViewController.keyboardWillShow(_:)), name: .UIKeyboardWillShow, object: nil)
         
+        let viewTapGesture = UITapGestureRecognizer(target: self, action: #selector(self.dismissKeyboard))
+        viewTapGesture.numberOfTapsRequired = 1
+        self.view.addGestureRecognizer(viewTapGesture)
+        
         fetchComments()
+        
+        // If the table view doesn't have enough rows remove the extra footer lines if the rows don't exist
+        tableView.tableFooterView = UIView()
+        tableView.estimatedRowHeight = 60
+        tableView.rowHeight = UITableViewAutomaticDimension
     }
     
     func keyboardWillShow(_ notification: NSNotification) {
         // When the keyboard is shown we will determine the height based of the keyboard size, we will then add that to a local variable which will be used to animate the view up.
         if let keyboardSize = (notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
             self.keyboardHeight = keyboardSize.height
-            
-            self.tableView.rowHeight = UITableViewAutomaticDimension
         }
     }
     
@@ -93,7 +121,6 @@ class CommentsViewController: UIViewController {
     func loadHashtagController(hashtag: String) {
         postService.fetchPosts(with: hashtag) { (posts) in
             print("Segue")
-            let dataDict: [String: Any] = ["hashtag": hashtag, "posts": posts]
             let storyboard = UIStoryboard(name: "Main", bundle: nil)
             let hashtagController = storyboard.instantiateViewController(withIdentifier: "hashtagController") as! HashtagsViewController
             hashtagController.posts = posts
@@ -129,7 +156,7 @@ extension CommentsViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if section == 0 {
-            if post!.caption != nil {
+            if post.caption != nil {
                 return 1
             } else {
                 return 0
@@ -142,7 +169,7 @@ extension CommentsViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if indexPath.section == 0 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "CommentsCaption", for: indexPath)
-        
+            
             let profilePicture = cell.viewWithTag(401) as! UIImageView
             profilePicture.layer.masksToBounds = true
             profilePicture.layer.cornerRadius = profilePicture.frame.width / 2
@@ -150,23 +177,24 @@ extension CommentsViewController: UITableViewDataSource {
             let captionTextView = cell.viewWithTag(402) as! UITextView
             captionTextView.textContainer.lineFragmentPadding = 0
             captionTextView.textContainerInset = UIEdgeInsets.zero
-            captionTextView.delegate = self
-            captionTextView.resolveHashTags()
+            captionTextView.text = "\(self.post.caption!)"
+            captionTextView.sizeToFit()
             
             authService.userFromId(id: post.userID!, completion: { (user) in
                 let username = user.username!
                 let caption = self.post.caption!
                 captionTextView.text = "\(username) \(caption)"
+                captionTextView.resolveHashTags()
+                captionTextView.sizeToFit()
+                captionTextView.delegate = self
                 if let photoURL = user.photoURL, let url = URL(string: photoURL) {
                     self.downloadTask = profilePicture.loadImage(url: url)
                 }
             })
             
-            captionTextView.sizeToFit()
-            
             return cell
         } else {
-            let cell = tableView.dequeueReusableCell(withIdentifier: "CommentsComment", for: indexPath)
+            let cell = tableView.dequeueReusableCell(withIdentifier: "CommentsCell", for: indexPath) as! CommentsCell
             
             let comment = comments[indexPath.row]
             
@@ -174,11 +202,12 @@ extension CommentsViewController: UITableViewDataSource {
             profilePicture.layer.masksToBounds = true
             profilePicture.layer.cornerRadius = profilePicture.frame.width / 2
             
+            
             let messageView = cell.viewWithTag(502) as! UITextView
             messageView.textContainer.lineFragmentPadding = 0
             messageView.textContainerInset = UIEdgeInsets.zero
-            messageView.delegate = self
-            messageView.resolveHashTags()
+            cell.captionTextView.delegate = self
+            messageView.text = "\(comment.comment!)"
             
             let date = Date(timeIntervalSince1970: comment.timestamp!)
             let timeLabel = cell.viewWithTag(503) as! UILabel
@@ -187,10 +216,11 @@ extension CommentsViewController: UITableViewDataSource {
             authService.userFromId(id: comment.userID!, completion: { (user) in
                 let username = user.username!
                 let message = comment.comment!
-                DispatchQueue.main.async {
-                    messageView.text = "\(username) \(message)"
-                    messageView.sizeToFit()
-                }
+                
+                messageView.text = "\(username) \(message)"
+                messageView.sizeToFit()
+                messageView.resolveHashTags()
+                
                 if let photoURL = user.photoURL, let url = URL(string: photoURL) {
                     self.downloadTask = profilePicture.loadImage(url: url)
                 }
@@ -200,24 +230,39 @@ extension CommentsViewController: UITableViewDataSource {
         }
     }
     
-    func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
-        if indexPath.section == 0 {
-            return UITableViewAutomaticDimension
-        } else {
-            //let postObject = commentsCaption.object(at: 0) as! CommentsCell
-            
-            //let newHeight = postObject.contentView.frame.height
-            
-            let newCommentView = CommentsCell.init(style: .default, reuseIdentifier: "CommentsComments")
-            let comment = comments[indexPath.row]
-            newCommentView.captionTextView.text = "\(comment)"
+    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         
-            let newHeight = newCommentView.contentView.frame.height
-            
-            if newHeight == 0 {
-                return UITableViewAutomaticDimension
+        if indexPath.section == 0 {
+            if post!.caption != nil, post!.userID! == currentUser!.uid {
+                return true
             } else {
-                return newHeight + 15
+                return false
+            }
+        } else {
+            let comment = comments[indexPath.row]
+            
+            if comment.userID! == currentUser!.uid {
+                return true
+            } else {
+                return false
+            }
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+        if (editingStyle == UITableViewCellEditingStyle.delete) {
+            
+            if indexPath.section == 0 {
+                postService.deleteCaption(post: post!, completion: { _ in
+                    self.tableView.reloadData()
+                })
+            } else {
+                let comment = comments[indexPath.row]
+                
+                postService.deleteComment(post: post!, comment: comment, completion: { _ in
+                    self.comments.remove(at: indexPath.row)
+                    self.tableView.reloadData()
+                })
             }
         }
     }
@@ -253,6 +298,7 @@ class CommentsCell: UITableViewCell {
     }
         
     override func awakeFromNib() {
-        // Awake
+        self.captionTextView.text = ""
+        self.timePostedLabel.text = ""
     }
 }

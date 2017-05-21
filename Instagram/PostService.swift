@@ -282,7 +282,7 @@ struct PostService {
         })
     }
     
-    func postComment(post: Post, comment: String, user: FIRUser) {
+    func postComment(post: Post, comment: String, user: FIRUser, completion: @escaping (FIRDatabaseReference) -> Void) {
         let postTimestamp = Date().timeIntervalSince1970
         let commentDict: [String: Any] = ["timestamp": postTimestamp, "userID": "\(user.uid)", "comment": comment]
         
@@ -294,9 +294,36 @@ struct PostService {
         
         commentData.updateChildValues(commentDict) { (error, reference) in
             if error == nil {
+                completion(reference)
                 print("Post Comment Succession")
             } else {
                 print(error!.localizedDescription)
+            }
+        }
+    }
+    
+    func deleteCaption(post: Post, completion: @escaping (FIRDatabaseReference) -> Void) {
+        let postData = databaseRef.child("Posts/\(post.userID!)/\(post.key)/caption")
+        
+        postData.removeValue { (error, reference) in
+            if error == nil {
+                print("Caption removed successfully!")
+                completion(reference)
+            } else {
+                print("There was an error removing the caption \(error!.localizedDescription)")
+            }
+        }
+    }
+    
+    func deleteComment(post: Post, comment: Comment, completion: @escaping (FIRDatabaseReference) -> Void) {
+        let commentData = databaseRef.child("Posts/\(post.userID!)/\(post.key)/comments/\(comment.key)/")
+        
+        commentData.removeValue { (error, reference) in
+            if error == nil {
+                print("Comment successfully deleted ")
+                completion(reference)
+            } else {
+                print("Error deleting comment \(error!.localizedDescription)")
             }
         }
     }
@@ -388,15 +415,15 @@ struct PostService {
         }
     }
     
-    typealias CommentsReceived = ([Comments]) -> Void
+    typealias CommentsReceived = ([Comment]) -> Void
     
     func fetchComments(post: Post, completion: @escaping CommentsReceived) {
         let userData = databaseRef.child("Posts/\(post.userID!)/\(post.key)/comments")
         
         userData.observeSingleEvent(of: .value, with: { (snapshot) in
-            var comments: [Comments] = []
+            var comments: [Comment] = []
             for children in snapshot.children {
-                let comment = Comments(snapshot: children as! FIRDataSnapshot)
+                let comment = Comment(snapshot: children as! FIRDataSnapshot)
                 comments.append(comment)
             }
             completion(comments)

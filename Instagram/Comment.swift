@@ -9,7 +9,7 @@
 import UIKit
 import Firebase
 
-class Comments {
+class Comment {
     var comment: String!
     var timestamp: TimeInterval!
     var userID: String!
