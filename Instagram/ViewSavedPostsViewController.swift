@@ -21,6 +21,10 @@ class ViewSavedPostsViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        if posts.count == 0 {
+            noPostsReceived()
+        }
+        
         let memoryCapacity = 500 * 1024 * 1024
         let diskCapacity = 500 * 1024 * 1024
         let cache = URLCache(memoryCapacity: memoryCapacity, diskCapacity: diskCapacity, diskPath: nil)
@@ -35,6 +39,17 @@ class ViewSavedPostsViewController: UIViewController {
         savedPostsCollectionView?.addSubview(refreshCtrl)
         
         print("Posts: \(posts)")
+    }
+    
+    func noPostsReceived() {
+        let alert = UIAlertController(title: "Error", message: "You have not been mentioned in any posts!", preferredStyle: .alert)
+        let okAction = UIAlertAction(title: "OK", style: .default, handler: { _ in
+            self.navigationController?.popViewController(animated: true)
+        })
+        
+        alert.addAction(okAction)
+        
+        self.present(alert, animated: true, completion: nil)
     }
     
     func reloadPosts() {

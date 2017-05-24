@@ -23,6 +23,10 @@ struct User {
     var following: [String: Any]?
     var followers: [String: Any]?
     
+    var databaseRef: FIRDatabaseReference {
+        return FIRDatabase.database().reference()
+    }
+    
     init(snapshot: FIRDataSnapshot) {
         username = (snapshot.value! as! NSDictionary)["username"] as! String
         email = (snapshot.value! as! NSDictionary)["email"] as! String

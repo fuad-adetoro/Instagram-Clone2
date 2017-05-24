@@ -9,6 +9,10 @@
 /* Begin PBXBuildFile section */
 		0639C1081ED0E1030061D68D /* user-placeholder.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 0639C1071ED0E1030061D68D /* user-placeholder.jpg */; };
 		0639C10A1ED0E80E0061D68D /* CommentsCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0639C1091ED0E80E0061D68D /* CommentsCell.xib */; };
+		0639C10C1ED359200061D68D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0639C10B1ED359200061D68D /* GoogleService-Info.plist */; };
+		0639C1101ED374700061D68D /* ProfileActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0639C10F1ED374700061D68D /* ProfileActivity.swift */; };
+		0639C1121ED39B580061D68D /* UserActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0639C1111ED39B580061D68D /* UserActivity.swift */; };
+		0639C1141ED3BB390061D68D /* UserActivityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0639C1131ED3BB390061D68D /* UserActivityViewController.swift */; };
 		18108C071EC3299E00858E56 /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18108C061EC3299E00858E56 /* SearchViewController.swift */; };
 		182F027E1EA3F90D00696E17 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 182F027C1EA3F90D00696E17 /* Main.storyboard */; };
 		182F02831EA3F90D00696E17 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 182F02811EA3F90D00696E17 /* LaunchScreen.storyboard */; };
@@ -53,7 +57,6 @@
 		187E08DD1EA517BE004F5907 /* DateExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187E08DC1EA517BE004F5907 /* DateExtension.swift */; };
 		187E08DF1EA5182F004F5907 /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187E08DE1EA5182F004F5907 /* HomeViewController.swift */; };
 		1894F9C61ECA532300C2AFA9 /* MentionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1894F9C51ECA532300C2AFA9 /* MentionsViewController.swift */; };
-		1894F9CC1ECC98DE00C2AFA9 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 1894F9CB1ECC98DE00C2AFA9 /* GoogleService-Info.plist */; };
 		18B96ACB1EB14E06007B6CBF /* ActivityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18B96ACA1EB14E06007B6CBF /* ActivityViewController.swift */; };
 		18B96ACD1EB79454007B6CBF /* UITextViewExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18B96ACC1EB79454007B6CBF /* UITextViewExtension.swift */; };
 		18C18A611EAB08D500D30708 /* UserProfileOrganizeCellNib.xib in Resources */ = {isa = PBXBuildFile; fileRef = 18C18A601EAB08D400D30708 /* UserProfileOrganizeCellNib.xib */; };
@@ -84,6 +87,10 @@
 /* Begin PBXFileReference section */
 		0639C1071ED0E1030061D68D /* user-placeholder.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "user-placeholder.jpg"; sourceTree = "<group>"; };
 		0639C1091ED0E80E0061D68D /* CommentsCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CommentsCell.xib; sourceTree = "<group>"; };
+		0639C10B1ED359200061D68D /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		0639C10F1ED374700061D68D /* ProfileActivity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileActivity.swift; sourceTree = "<group>"; };
+		0639C1111ED39B580061D68D /* UserActivity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserActivity.swift; sourceTree = "<group>"; };
+		0639C1131ED3BB390061D68D /* UserActivityViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserActivityViewController.swift; sourceTree = "<group>"; };
 		18108C061EC3299E00858E56 /* SearchViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchViewController.swift; sourceTree = "<group>"; };
 		182F02751EA3F90D00696E17 /* Instagram.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Instagram.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		182F027D1EA3F90D00696E17 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -132,7 +139,6 @@
 		187E08DC1EA517BE004F5907 /* DateExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DateExtension.swift; sourceTree = "<group>"; };
 		187E08DE1EA5182F004F5907 /* HomeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = HomeViewController.swift; sourceTree = "<group>"; };
 		1894F9C51ECA532300C2AFA9 /* MentionsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MentionsViewController.swift; sourceTree = "<group>"; };
-		1894F9CB1ECC98DE00C2AFA9 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		18B96ACA1EB14E06007B6CBF /* ActivityViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActivityViewController.swift; sourceTree = "<group>"; };
 		18B96ACC1EB79454007B6CBF /* UITextViewExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UITextViewExtension.swift; sourceTree = "<group>"; };
 		18C18A601EAB08D400D30708 /* UserProfileOrganizeCellNib.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = UserProfileOrganizeCellNib.xib; sourceTree = "<group>"; };
@@ -208,7 +214,7 @@
 				182F02811EA3F90D00696E17 /* LaunchScreen.storyboard */,
 				182F027C1EA3F90D00696E17 /* Main.storyboard */,
 				0639C1071ED0E1030061D68D /* user-placeholder.jpg */,
-				1894F9CB1ECC98DE00C2AFA9 /* GoogleService-Info.plist */,
+				0639C10B1ED359200061D68D /* GoogleService-Info.plist */,
 			);
 			path = Instagram;
 			sourceTree = "<group>";
@@ -258,6 +264,7 @@
 				186D4A3A1EBCE57C00A894BE /* HashtagsViewController.swift */,
 				18108C061EC3299E00858E56 /* SearchViewController.swift */,
 				1894F9C51ECA532300C2AFA9 /* MentionsViewController.swift */,
+				0639C1131ED3BB390061D68D /* UserActivityViewController.swift */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
@@ -277,6 +284,8 @@
 				187E08CE1EA508FB004F5907 /* UIButtonExtension.swift */,
 				187E08CF1EA508FB004F5907 /* UIImageExtension.swift */,
 				187E08D01EA508FB004F5907 /* User.swift */,
+				0639C10F1ED374700061D68D /* ProfileActivity.swift */,
+				0639C1111ED39B580061D68D /* UserActivity.swift */,
 			);
 			name = Extra;
 			sourceTree = "<group>";
@@ -424,7 +433,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1894F9CC1ECC98DE00C2AFA9 /* GoogleService-Info.plist in Resources */,
 				187E08C51EA50895004F5907 /* ProfilePhotoCell.xib in Resources */,
 				182F02831EA3F90D00696E17 /* LaunchScreen.storyboard in Resources */,
 				187E08BE1EA50895004F5907 /* PostCell.xib in Resources */,
@@ -438,6 +446,7 @@
 				18EE458A1EA573790004768C /* Assets.xcassets in Resources */,
 				182F027E1EA3F90D00696E17 /* Main.storyboard in Resources */,
 				0639C10A1ED0E80E0061D68D /* CommentsCell.xib in Resources */,
+				0639C10C1ED359200061D68D /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -609,6 +618,7 @@
 				187E08A91EA50802004F5907 /* SecondSignUpViewController.swift in Sources */,
 				187E08BF1EA50895004F5907 /* PostCellWithCaption.swift in Sources */,
 				187E08D81EA508FB004F5907 /* UIImageExtension.swift in Sources */,
+				0639C1121ED39B580061D68D /* UserActivity.swift in Sources */,
 				187E08A11EA50802004F5907 /* CommentsViewController.swift in Sources */,
 				18B96ACB1EB14E06007B6CBF /* ActivityViewController.swift in Sources */,
 				187E08C41EA50895004F5907 /* ProfilePhotoCell.swift in Sources */,
@@ -628,6 +638,7 @@
 				187E08A01EA50802004F5907 /* SelectedPhotoViewController.swift in Sources */,
 				187E08C61EA50895004F5907 /* ProfileViewOneImageCellNib.swift in Sources */,
 				187E08D91EA508FB004F5907 /* User.swift in Sources */,
+				0639C1101ED374700061D68D /* ProfileActivity.swift in Sources */,
 				187E08A21EA50802004F5907 /* EditProfileViewController.swift in Sources */,
 				1863ABBB1EA7CBBE00BE5576 /* ViewUserProfileViewController.swift in Sources */,
 				187E08DB1EA5179E004F5907 /* Post.swift in Sources */,
@@ -635,6 +646,7 @@
 				187E08D71EA508FB004F5907 /* UIButtonExtension.swift in Sources */,
 				187E08D21EA508FB004F5907 /* Comment.swift in Sources */,
 				187E08A31EA50802004F5907 /* FirstSignUpViewController.swift in Sources */,
+				0639C1141ED3BB390061D68D /* UserActivityViewController.swift in Sources */,
 				187E08A71EA50802004F5907 /* ProfilePageViewController.swift in Sources */,
 				187E08BD1EA50895004F5907 /* PostCell.swift in Sources */,
 				183C17811EABDADD00F6B833 /* SavedPosts.swift in Sources */,

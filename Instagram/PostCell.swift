@@ -110,6 +110,8 @@ class PostCell: UICollectionViewCell {
         let date = Date(timeIntervalSince1970: post.timestamp!)
         self.timePosted.text = date.timeAgoDisplay()
         
+        self.usernameLabel.setTitle(post.username!, for: .normal)
+        
         postService.isPostLiked(post: post) { (status) in
             self.isLiked = status
             self.setupInitialLikeButton()

@@ -202,8 +202,9 @@ struct PostService {
     
     func likePost(post: Post, completion: @escaping PostLikes) {
         let currentUser = FIRAuth.auth()?.currentUser
-        let likeDict = ["\(currentUser!.uid)": true]
-        let userData = databaseRef.child("Posts/\(post.userID!)/\(post.key)/likers/")
+        let likeTimestamp = Date().timeIntervalSince1970
+        let likeDict = ["userID": currentUser!.uid, "timestamp": likeTimestamp] as [String : Any]
+        let userData = databaseRef.child("Posts/\(post.userID!)/\(post.key)/likers/\(currentUser!.uid)")
         
         userData.updateChildValues(likeDict) { (error, reference) in
             if error == nil {
@@ -284,14 +285,38 @@ struct PostService {
     
     func postComment(post: Post, comment: String, user: FIRUser, completion: @escaping (FIRDatabaseReference) -> Void) {
         let postTimestamp = Date().timeIntervalSince1970
-        let commentDict: [String: Any] = ["timestamp": postTimestamp, "userID": "\(user.uid)", "comment": comment]
+        var commentDict: [String: Any] = ["timestamp": postTimestamp, "userID": "\(user.uid)", "comment": comment]
+        
+        var hashtags: [String] = []
+        var mentions: [String] = []
+        
+        
+        let words = comment.components(separatedBy: " ")
+        
+        for word in words {
+            if word.hasPrefix("#") {
+                hashtags.append(word)
+            } else if word.hasPrefix("@") {
+                mentions.append(word)
+            }
+        }
+        
+        
+        // If hashtags isn't empty
+        if hashtags != [] {
+            let hashtagsString = hashtags.joined(separator: " ")
+            commentDict["hashtags"] = hashtagsString
+        }
+        
+        if mentions != [] {
+            let mentionsString = mentions.joined(separator: " ")
+            commentDict["mentions"] = mentionsString
+        }
         
         let randomKey = databaseRef.child("Posts/\(post.userID!)/\(post.key)").childByAutoId().key
         
         let commentData = databaseRef.child("Posts/\(post.userID!)/\(post.key)/comments/\(randomKey)")
-        
-        //commentDict.updateValue("mentions", forKey: "")
-        
+                
         commentData.updateChildValues(commentDict) { (error, reference) in
             if error == nil {
                 completion(reference)

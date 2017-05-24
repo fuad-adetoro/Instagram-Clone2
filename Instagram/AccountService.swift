@@ -19,9 +19,10 @@ struct AccountService {
     
     func followUser(userID: String, currentUser: FIRUser) {
         let followDict: [String: Any] = [userID: true]
-        let followersDict: [String: Any] = [currentUser.uid: true]
+        let followTimestamp = Date().timeIntervalSince1970
+        let followersDict: [String: Any] = ["userID": currentUser.uid, "timestamp": followTimestamp]
         let followingData = databaseRef.child("Users/\(currentUser.uid)/following/")
-        let followersData = databaseRef.child("Users/\(userID)/followers/")
+        let followersData = databaseRef.child("Users/\(userID)/followers/\(currentUser.uid)/")
         
         // This function adds the currentUser to the other users follers data and the user to be followed to the current user's following database
         

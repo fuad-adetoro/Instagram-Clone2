@@ -160,6 +160,14 @@ class HomeViewController: UIViewController {
             })
         }
     }
+    
+    func loadProfileWithTap(sender: UITapGestureRecognizer) {
+        if let indexPath = self.profileCollectionView.indexPathForItem(at: sender.location(in: self.profileCollectionView)) {
+                
+            let post = posts[indexPath.row]
+            loadProfileWithUsername(username: post.username!)
+        }
+    }
 
     func postOptions(_ sender: UITapGestureRecognizer) {
         if let indexPath = self.profileCollectionView.indexPathForItem(at: sender.location(in: self.profileCollectionView)) {

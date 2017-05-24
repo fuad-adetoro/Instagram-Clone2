@@ -70,10 +70,6 @@
                                 <rect key="frame" x="41" y="364" width="22" height="22"/>
                                 <state key="normal" image="messagebutton"/>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="QcT-Tq-JF6">
-                                <rect key="frame" x="71" y="364" width="24" height="22"/>
-                                <state key="normal" image="picturedirectmessage"/>
-                            </button>
                             <label opaque="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0 likes" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="apz-CS-9Ba">
                                 <rect key="frame" x="27" y="403" width="23" height="9"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="7"/>
@@ -111,7 +107,6 @@
                             <constraint firstItem="PRJ-Ti-Z7X" firstAttribute="top" secondItem="wU9-5Z-bxL" secondAttribute="bottom" constant="14" id="2pv-2t-mRd"/>
                             <constraint firstItem="Xxg-AC-dIh" firstAttribute="top" secondItem="Z4H-QJ-rhy" secondAttribute="bottom" constant="8" id="3h6-7k-ZAx"/>
                             <constraint firstItem="GRX-Tw-22M" firstAttribute="top" secondItem="Xxg-AC-dIh" secondAttribute="bottom" constant="8" id="8Ap-Ym-gxE"/>
-                            <constraint firstItem="Z0s-FV-Q6p" firstAttribute="height" secondItem="QcT-Tq-JF6" secondAttribute="height" id="8O5-Mj-KvK"/>
                             <constraint firstAttribute="trailing" secondItem="GRX-Tw-22M" secondAttribute="trailing" constant="6" id="AER-cr-E8p"/>
                             <constraint firstItem="Z0s-FV-Q6p" firstAttribute="height" secondItem="Cya-c5-bkc" secondAttribute="height" id="Asf-uS-3E5"/>
                             <constraint firstAttribute="trailing" secondItem="AcP-U1-cKf" secondAttribute="trailing" constant="8" id="Gzb-bI-Fjm"/>
@@ -133,15 +128,12 @@
                             <constraint firstItem="Z4H-QJ-rhy" firstAttribute="top" secondItem="Z0s-FV-Q6p" secondAttribute="bottom" constant="8" id="guX-2k-vpF"/>
                             <constraint firstItem="Cya-c5-bkc" firstAttribute="top" secondItem="PRJ-Ti-Z7X" secondAttribute="bottom" constant="8" id="jh2-JR-bUW"/>
                             <constraint firstItem="GRX-Tw-22M" firstAttribute="leading" secondItem="qKw-7s-jVR" secondAttribute="leading" constant="6" id="kcJ-o7-5aT"/>
-                            <constraint firstItem="QcT-Tq-JF6" firstAttribute="top" secondItem="PRJ-Ti-Z7X" secondAttribute="bottom" constant="8" id="lOe-Ty-kI8"/>
                             <constraint firstAttribute="trailing" secondItem="qdi-Xq-j6J" secondAttribute="trailing" constant="8" id="ldW-Uw-sTc"/>
                             <constraint firstAttribute="trailing" secondItem="PRJ-Ti-Z7X" secondAttribute="trailing" id="nEU-D0-1Pm"/>
                             <constraint firstItem="Z4H-QJ-rhy" firstAttribute="top" secondItem="Cya-c5-bkc" secondAttribute="bottom" constant="8" id="r6z-Jt-M7X"/>
                             <constraint firstAttribute="bottom" secondItem="wfE-YT-0UY" secondAttribute="bottom" constant="5" id="szS-4K-8ek"/>
                             <constraint firstItem="PRJ-Ti-Z7X" firstAttribute="top" secondItem="Ass-aB-cUa" secondAttribute="bottom" constant="8" id="tKt-8C-6AY"/>
                             <constraint firstItem="Ass-aB-cUa" firstAttribute="leading" secondItem="qKw-7s-jVR" secondAttribute="leading" constant="8" id="xUU-RU-8IE"/>
-                            <constraint firstItem="QcT-Tq-JF6" firstAttribute="leading" secondItem="Cya-c5-bkc" secondAttribute="trailing" constant="8" id="xxG-go-9K9"/>
-                            <constraint firstItem="Z4H-QJ-rhy" firstAttribute="top" secondItem="QcT-Tq-JF6" secondAttribute="bottom" constant="8" id="y4q-Yp-5If"/>
                             <constraint firstItem="Z4H-QJ-rhy" firstAttribute="top" secondItem="AcP-U1-cKf" secondAttribute="bottom" constant="8" id="yse-QH-zkp"/>
                         </constraints>
                     </view>
@@ -173,7 +165,6 @@
         <image name="homeuseroptions" width="14" height="4"/>
         <image name="likebutton" width="25" height="21"/>
         <image name="messagebutton" width="22" height="22"/>
-        <image name="picturedirectmessage" width="24" height="21"/>
         <image name="pictureliked" width="25" height="21"/>
         <image name="savedpicture" width="17" height="21"/>
         <image name="savepicture" width="17" height="21"/>

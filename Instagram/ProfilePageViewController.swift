@@ -29,9 +29,9 @@ class ProfilePageViewController: UIViewController {
             self.authService.logUserOut(currentUser: self.currentUser, completion: { (status) in
                 if status as! Bool {
                     let storyboard = UIStoryboard(name: "Main", bundle: nil)
-                    let loginVC = storyboard.instantiateViewController(withIdentifier: "LoginVC") as! LoginViewController
+                    let navigationController = storyboard.instantiateInitialViewController() as! UINavigationController
                     
-                    self.present(loginVC, animated: true, completion: nil)
+                    self.present(navigationController, animated: true, completion: nil)
                 } else {
                     let alert = UIAlertController(title: "Error Logging Out!", message: "There seemed to be error logging out, please try again.", preferredStyle: .alert)
                     let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)

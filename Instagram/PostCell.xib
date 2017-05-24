@@ -73,10 +73,6 @@
                                 <rect key="frame" x="41" y="364" width="22" height="22"/>
                                 <state key="normal" image="messagebutton"/>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yc1-oQ-Tsb">
-                                <rect key="frame" x="71" y="364" width="24" height="22"/>
-                                <state key="normal" image="picturedirectmessage"/>
-                            </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0 likes" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="JeG-UR-vgc">
                                 <rect key="frame" x="27" y="403" width="23" height="9"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="7"/>
@@ -102,10 +98,8 @@
                         <constraints>
                             <constraint firstItem="fwC-Sf-mbr" firstAttribute="leading" secondItem="deV-41-cRY" secondAttribute="leading" constant="8" id="0SC-Kf-70n"/>
                             <constraint firstItem="vhJ-4J-qmu" firstAttribute="leading" secondItem="deV-41-cRY" secondAttribute="leading" constant="8" id="0Ym-PA-uKU"/>
-                            <constraint firstItem="yc1-oQ-Tsb" firstAttribute="top" secondItem="wWi-yZ-iyF" secondAttribute="bottom" constant="8" id="3aV-BT-7Qn"/>
                             <constraint firstAttribute="bottom" secondItem="Qre-nu-O5q" secondAttribute="bottom" constant="8" id="6Zc-p0-R6g"/>
                             <constraint firstItem="hDt-eB-bef" firstAttribute="top" secondItem="deV-41-cRY" secondAttribute="top" constant="8" id="7AS-v2-Yer"/>
-                            <constraint firstItem="tD9-Ul-Ot0" firstAttribute="top" secondItem="yc1-oQ-Tsb" secondAttribute="bottom" constant="8" id="BeE-qs-fKU"/>
                             <constraint firstAttribute="trailing" secondItem="wWi-yZ-iyF" secondAttribute="trailing" id="D1G-sC-tYm"/>
                             <constraint firstItem="4ib-c5-rRu" firstAttribute="top" secondItem="deV-41-cRY" secondAttribute="top" constant="13" id="EWo-Ti-f1b"/>
                             <constraint firstItem="JeG-UR-vgc" firstAttribute="leading" secondItem="fwC-Sf-mbr" secondAttribute="trailing" constant="8" id="Elu-m4-eIH"/>
@@ -120,9 +114,7 @@
                             <constraint firstItem="JeG-UR-vgc" firstAttribute="top" secondItem="tD9-Ul-Ot0" secondAttribute="bottom" constant="8" id="VbK-bK-Xx6"/>
                             <constraint firstItem="tD9-Ul-Ot0" firstAttribute="top" secondItem="ByV-Rt-8Bh" secondAttribute="bottom" constant="8" id="WP9-OG-a0u"/>
                             <constraint firstItem="vhJ-4J-qmu" firstAttribute="top" secondItem="wWi-yZ-iyF" secondAttribute="bottom" constant="8" id="XWU-8q-6WX"/>
-                            <constraint firstItem="vhJ-4J-qmu" firstAttribute="height" secondItem="yc1-oQ-Tsb" secondAttribute="height" id="ZUA-RU-FNU"/>
                             <constraint firstAttribute="trailing" secondItem="5mG-Qb-mV5" secondAttribute="trailing" constant="8" id="ZsY-1a-VBW"/>
-                            <constraint firstItem="yc1-oQ-Tsb" firstAttribute="leading" secondItem="ByV-Rt-8Bh" secondAttribute="trailing" constant="8" id="aWg-TX-k6f"/>
                             <constraint firstItem="Qre-nu-O5q" firstAttribute="top" secondItem="JeG-UR-vgc" secondAttribute="bottom" constant="8" id="brd-Jt-Mcz"/>
                             <constraint firstItem="tD9-Ul-Ot0" firstAttribute="top" secondItem="gZS-GV-w7f" secondAttribute="bottom" constant="8" id="dI9-M3-zhq"/>
                             <constraint firstItem="gZS-GV-w7f" firstAttribute="top" secondItem="wWi-yZ-iyF" secondAttribute="bottom" constant="8" id="eMh-Cq-jUK"/>
@@ -165,7 +157,6 @@
         <image name="homeuseroptions" width="14" height="4"/>
         <image name="likebutton" width="25" height="21"/>
         <image name="messagebutton" width="22" height="22"/>
-        <image name="picturedirectmessage" width="24" height="21"/>
         <image name="pictureliked" width="25" height="21"/>
         <image name="savedpicture" width="17" height="21"/>
         <image name="savepicture" width="17" height="21"/>

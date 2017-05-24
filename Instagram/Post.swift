@@ -20,6 +20,7 @@ struct Post {
     var username: String!
     var hashtags: String?
     var mentions: String?
+    var likers: [String: Any]?
     
     init(snapshot: FIRDataSnapshot) {
         key = snapshot.key
@@ -32,5 +33,10 @@ struct Post {
         username = (snapshot.value as! NSDictionary)["username"] as! String
         hashtags = (snapshot.value as! NSDictionary)["hashtags"] as? String
         mentions = (snapshot.value as! NSDictionary)["mentions"] as? String
+        likers = (snapshot.value as? NSDictionary)?["likers"] as? [String: [String: Any]]
+        
+        if likers != nil {
+            print("ALLLIKERS: \(likers!)")
+        }
     }
 }
