@@ -21,7 +21,7 @@ class PostCell: UICollectionViewCell {
     @IBOutlet weak var optionsButton: UIButton!
     
     var currentPost: Post?
-    var user = FIRAuth.auth()?.currentUser
+    var user = Auth.auth().currentUser
     
     var downloadTask: URLSessionDownloadTask!
 
@@ -40,7 +40,7 @@ class PostCell: UICollectionViewCell {
         }
     }
     
-    func savePost(post: Post, user: FIRUser) {
+    func savePost(post: Post, user: User) {
         postService.savePost(post: post, currentUser: user) { (saved) in
             if saved {
                 self.saveButton.setImage(#imageLiteral(resourceName: "savedpicture"), for: .normal)
@@ -48,7 +48,7 @@ class PostCell: UICollectionViewCell {
         }
     }
     
-    func unSavePost(post: Post, user: FIRUser) {
+    func unSavePost(post: Post, user: User) {
         postService.unSavePost(post: post, currentUser: user) { (unSaved) in
             if unSaved {
                 self.saveButton.setImage(#imageLiteral(resourceName: "savepicture"), for: .normal)
@@ -94,12 +94,12 @@ class PostCell: UICollectionViewCell {
     
     func configure(post: Post) {
         self.currentPost = post
-        var databaseRef: FIRDatabaseReference {
-            return FIRDatabase.database().reference()
+        var databaseRef: DatabaseReference {
+            return Database.database().reference()
         }
         
-        var storageRef: FIRStorage {
-            return FIRStorage.storage()
+        var storageRef: Storage {
+            return Storage.storage()
         }
         
         likesLabel.text = "\(post.likes!) likes"
@@ -132,13 +132,13 @@ class PostCell: UICollectionViewCell {
     }
     
     func setupProfilePicture(userID: String) {
-        var storageRef: FIRStorage {
-            return FIRStorage.storage()
+        var storageRef: Storage {
+            return Storage.storage()
         }
         
-        authService.userFromId(id: userID) { (user) in
-            if let profilePicture = user.photoURL {
-                storageRef.reference(forURL: profilePicture).data(withMaxSize: 5 * 1024 * 1024, completion: { (imgData, error) in
+        authService.userFromId(id: userID) { (profile) in
+            if let profilePicture = profile.photoURL {
+                storageRef.reference(forURL: profilePicture).getData(maxSize: 5 * 1024 * 1024, completion: { (imgData, error) in
                     if error == nil {
                         if let image = imgData {
                             DispatchQueue.main.async {

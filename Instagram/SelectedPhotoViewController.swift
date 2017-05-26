@@ -18,9 +18,8 @@ class SelectedPhotoViewController: UIViewController {
     let postService = PostService()
     
     func postPicture() {
-        let currentUser = FIRAuth.auth()!.currentUser
-        let user = currentUser!
-        postService.createPost(picture: pictureToUpload.image!, caption: captionText.text!, user: user) { (status) in
+        let currentUser = Auth.auth().currentUser
+        postService.createPost(picture: pictureToUpload.image!, caption: captionText.text!, user: currentUser!) { (status) in
             if status {
                 self.dismiss(animated: true, completion: nil)
             } else {

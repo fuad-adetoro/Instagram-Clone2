@@ -18,8 +18,8 @@ class ViewUserProfileViewController: UIViewController {
         case listView
     }
     
-    var user: User?
-    var currentUser = FIRAuth.auth()?.currentUser
+    var profile: Profile?
+    var currentUser = Auth.auth().currentUser
     var posts: [Post] = []
     let postService = PostService()
     let accountService = AccountService()
@@ -64,13 +64,13 @@ class ViewUserProfileViewController: UIViewController {
     }
     
     func fetchUser() {
-        self.navigationItem.title = user!.username!
+        self.navigationItem.title = profile!.username!
         
         self.fetchPosts()
     }
     
     func fetchPosts() {
-        self.postService.fetchPosts(userID: user!.userID!) { (userPosts) in
+        self.postService.fetchPosts(userID: profile!.userID!) { (userPosts) in
             let postsSorted = userPosts.sorted(by: {Date(timeIntervalSince1970: $0.timestamp!) > Date(timeIntervalSince1970: $1.timestamp!)})
             self.posts = postsSorted
             if let refreshCtrl = self.view.viewWithTag(91) as? UIRefreshControl {
@@ -84,7 +84,7 @@ class ViewUserProfileViewController: UIViewController {
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         let navController = storyboard.instantiateViewController(withIdentifier: "EditProfile") as! UINavigationController
         let editProfileVC = navController.topViewController as! EditProfileViewController
-        let user = FIRAuth.auth()?.currentUser
+        let user = Auth.auth().currentUser
         editProfileVC.user = user!
         present(navController, animated: true, completion: nil)
     }
@@ -93,9 +93,9 @@ class ViewUserProfileViewController: UIViewController {
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         let profilePostVC = storyboard.instantiateViewController(withIdentifier: "ShowPost") as! ViewProfilePostController
         let post = dataDict["post"] as! Post
-        let user = dataDict["user"] as! User
+        let user = dataDict["profile"] as! Profile
         profilePostVC.post = post
-        profilePostVC.user = user
+        profilePostVC.profile = profile
         
         self.navigationController?.pushViewController(profilePostVC, animated: true)
     }
@@ -138,36 +138,36 @@ class ViewUserProfileViewController: UIViewController {
     }
     
     func goToFollowing() {
-        if user != nil {
-            accountService.fetchFollowing(user: user!) { (users) in
+        if profile != nil {
+            accountService.fetchFollowing(profile: profile!) { (profiles) in
                 let storyboard = UIStoryboard(name: "Main", bundle: nil)
                 let activityVC = storyboard.instantiateViewController(withIdentifier: "ActivityControl") as! ActivityViewController
-                activityVC.users = users
+                activityVC.profiles = profiles
                 activityVC.activity = .following
-                activityVC.user = self.user!
+                activityVC.profile = self.profile!
                 self.navigationController?.pushViewController(activityVC, animated: true)
             }
         }
     }
     
     func goToFollowers() {
-        if user != nil {
-            accountService.fetchFollowers(user: user!) { (users) in
+        if profile != nil {
+            accountService.fetchFollowers(profile: profile!) { (profiles) in
                 let storyboard = UIStoryboard(name: "Main", bundle: nil)
                 let activityVC = storyboard.instantiateViewController(withIdentifier: "ActivityControl") as! ActivityViewController
-                activityVC.users = users
+                activityVC.profiles = profiles
                 activityVC.activity = .followers
-                activityVC.user = self.user!
+                activityVC.profile = self.profile!
                 self.navigationController?.pushViewController(activityVC, animated: true)
             }
         }
     }
     
     func loadProfileWithUsername(username: String) {
-        accountService.fetchUserWithUsername(username: username) { (user) in
+        accountService.fetchUserWithUsername(username: username) { (profile) in
             let storyboard = UIStoryboard(name: "Main", bundle: nil)
             let profileVC = storyboard.instantiateViewController(withIdentifier: "ViewUserProfile") as! ViewUserProfileViewController
-            profileVC.user = user
+            profileVC.profile = profile
             self.navigationController?.pushViewController(profileVC, animated: true)
         }
     }
@@ -187,13 +187,13 @@ class ViewUserProfileViewController: UIViewController {
     func displayLikesController(_ sender: UITapGestureRecognizer) {
         if let indexPath = self.profileCollectionView.indexPathForItem(at: sender.location(in: self.profileCollectionView)) {
             let post = posts[indexPath.row]
-            postService.fetchPostLikes(post: post, completion: { (users) in
-                if !users.isEmpty {
+            postService.fetchPostLikes(post: post, completion: { (profiles) in
+                if !profiles.isEmpty {
                     let storyboard = UIStoryboard(name: "Main", bundle: nil)
                     let activityVC = storyboard.instantiateViewController(withIdentifier: "ActivityControl") as! ActivityViewController
-                    activityVC.users = users
+                    activityVC.profiles = profiles
                     activityVC.activity = .likes
-                    activityVC.user = self.user!
+                    activityVC.profile = self.profile!
                     self.navigationController?.pushViewController(activityVC, animated: true)
                 }
             })
@@ -211,8 +211,8 @@ class ViewUserProfileViewController: UIViewController {
     }
     
     func mentionPosts() {
-        if user != nil {
-            postService.usersMentionPosts(username: user!.username!, completion: { (posts) in
+        if profile != nil {
+            postService.usersMentionPosts(username: profile!.username!, completion: { (posts) in
                 let storyboard = UIStoryboard(name: "Main", bundle: nil)
                 let mentionsVC = storyboard.instantiateViewController(withIdentifier: "DisplayMentions") as! MentionsViewController
                 mentionsVC.posts = posts
@@ -293,21 +293,21 @@ extension ViewUserProfileViewController: UICollectionViewDataSource {
             followersTapped.numberOfTapsRequired = 1
             followersView.addGestureRecognizer(followersTapped)
             
-            if user != nil {
-                cell.configure(user: user!)
+            if profile != nil {
+                cell.configure(profile: profile!)
     
                 let editProfile = cell.editProfileButton!
                 
-                if user!.userID! == currentUser!.uid {
+                if profile!.userID! == currentUser!.uid {
                     editProfile.addTarget(self, action: #selector(ViewUserProfileViewController.editProfile), for: .touchUpInside)
                 } else {
-                    cell.interactiveButton(user: user!, currentUser: currentUser!)
+                    cell.interactiveButton(profile: profile!, currentUser: currentUser!)
                 }
             }
             
             return cell
         } else if indexPath.section == 1 {
-            if user!.userID! != currentUser!.uid {
+            if profile!.userID! != currentUser!.uid {
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "UserProfileOrganizeCellNib", for: indexPath)
                 
                 let listView = cell.viewWithTag(1902) as! UIImageView
@@ -387,7 +387,7 @@ extension ViewUserProfileViewController: UICollectionViewDataSource {
                     let commentsButton = cell.viewWithTag(2005) as! UIButton
                     commentsButton.addTarget(self, action: #selector(ViewUserProfileViewController.goToComments(_:)), for: .touchUpInside)
                     
-                    let username = user!.username!
+                    let username = profile!.username!
                     
                     cell.captionTextView.text = "\(username) \(caption)"
                     cell.captionTextView.resolveHashTags()
@@ -436,8 +436,8 @@ extension ViewUserProfileViewController: UICollectionViewDataSource {
         if indexPath.section == 0 && indexPath.row == 0 {
             let profileObject = profileCellNib.object(at: 0) as! ProfileCellNib
             
-            if user != nil {
-                profileObject.configure(biograph: user!.biograph, displayName: user!.name)
+            if profile != nil {
+                profileObject.configure(biograph: profile!.biograph, displayName: profile!.name)
                 
                 let newHeight = profileObject.preferredLayoutSizeFittingSize(targetSize: CGSize(width: self.view.frame.width, height: 0)).height
                 
@@ -462,7 +462,7 @@ extension ViewUserProfileViewController: UICollectionViewDataSource {
                 
                 let post = posts[indexPath.row]
                 if post.caption != nil {
-                    postObject.configure(username: user!.username!, caption: post.caption!)
+                    postObject.configure(username: profile!.username!, caption: post.caption!)
                     //postObject.configure(post: post)
                     let newHeight = postObject.preferredLayoutSizeFittingSize(targetSize: CGSize(width: self.view.frame.width, height: 0)).height
                     print("new height: \(newHeight) received!")
@@ -502,8 +502,8 @@ extension ViewUserProfileViewController: UICollectionViewDelegate {
         
         if indexPath.section == 2 {
             let post = posts[indexPath.row]
-            postService.userFromId(id: post.userID!, completion: { (user) in
-                let dataDict: [String: Any] = ["user": user, "post": post]
+            postService.userFromId(id: post.userID!, completion: { (profile) in
+                let dataDict: [String: Any] = ["profile": profile, "post": post]
                 self.goToPost(dataDict: dataDict)
             })
         }

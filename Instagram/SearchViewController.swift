@@ -13,7 +13,7 @@ class SearchViewController: UIViewController {
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var searchBar: UISearchBar!
     let accountService = AccountService()
-    var users: [User] = []
+    var profiles: [Profile] = []
     var downloadTask: URLSessionDownloadTask!
     
     override func viewDidLoad() {
@@ -42,8 +42,8 @@ class SearchViewController: UIViewController {
     
     
     func search(searchText: String) {
-        accountService.searchUsers(searchText: searchText) { (foundUsers) in
-            self.users = foundUsers
+        accountService.searchUsers(searchText: searchText) { (profiles) in
+            self.profiles = profiles
             self.tableView.reloadData()
         }
     }
@@ -65,7 +65,7 @@ extension SearchViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return users.count
+        return profiles.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -78,17 +78,17 @@ extension SearchViewController: UITableViewDataSource {
         profilePicture.layer.masksToBounds = true
         profilePicture.layer.cornerRadius = profilePicture.frame.width / 2
         
-        let user = users[indexPath.row]
+        let profile = profiles[indexPath.row]
         
-        if let photoURL = user.photoURL, let url = URL(string: photoURL) {
+        if let photoURL = profile.photoURL, let url = URL(string: photoURL) {
             self.downloadTask = profilePicture.loadImage(url: url)
         }
         
-        print("blah: \(user.username!)")
+        print("blah: \(profile.username!)")
         
-        usernameField.text = user.username
+        usernameField.text = profile.username
         
-        if let name = user.name {
+        if let name = profile.name {
             nameField.isHidden = false
             nameField.text = name
         } else {
@@ -101,10 +101,10 @@ extension SearchViewController: UITableViewDataSource {
 
 extension SearchViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let user = users[indexPath.row]
+        let profile = profiles[indexPath.row]
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         let viewUserProfileVC = storyboard.instantiateViewController(withIdentifier: "ViewUserProfile") as! ViewUserProfileViewController
-        viewUserProfileVC.user = user
+        viewUserProfileVC.profile = profile
         
         self.navigationController?.pushViewController(viewUserProfileVC, animated: true)
         print("Selected: \(indexPath.row)")

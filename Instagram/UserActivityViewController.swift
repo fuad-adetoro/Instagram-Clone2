@@ -11,8 +11,8 @@ import Firebase
 
 class UserActivityViewController: UIViewController {
 
-    let currentUser = FIRAuth.auth()?.currentUser
-    var user: User?
+    let currentUser = Auth.auth().currentUser
+    var profile: Profile?
     let authService = AuthService()
     let accountService = AccountService()
     var activity: [UserActivity] = []
@@ -36,17 +36,17 @@ class UserActivityViewController: UIViewController {
     }
     
     func fetchUser() {
-        authService.fetchUser(user: currentUser!) { (user) in
-            self.user = user
+        authService.fetchUser(user: currentUser!) { (profile) in
+            self.profile = profile
             if let refreshControl = self.view.viewWithTag(60) as? UIRefreshControl {
                 refreshControl.beginRefreshing()
             }
-            self.setupActivity(user: user)
+            self.setupActivity(profile: profile)
         }
     }
     
-    func setupActivity(user: User) {
-        let profileActivity = ProfileActivity(user: user)
+    func setupActivity(profile: Profile) {
+        let profileActivity = ProfileActivity(profile: profile)
         
         profileActivity.checkProfileActivity { (userActivity) in
             self.activity = userActivity
@@ -61,10 +61,10 @@ class UserActivityViewController: UIViewController {
     }
     
     func loadProfileWithUsername(username: String) {
-        accountService.fetchUserWithUsername(username: username) { (user) in
+        accountService.fetchUserWithUsername(username: username) { (profile) in
             let storyboard = UIStoryboard(name: "Main", bundle: nil)
             let profileVC = storyboard.instantiateViewController(withIdentifier: "ViewUserProfile") as! ViewUserProfileViewController
-            profileVC.user = user
+            profileVC.profile = profile
             self.navigationController?.pushViewController(profileVC, animated: true)
         }
     }
@@ -73,8 +73,8 @@ class UserActivityViewController: UIViewController {
         if let indexPath = self.tableView.indexPathForRow(at: sender.location(in: self.tableView)) {
             let userActivity = activity[indexPath.row]
             
-            if let user = userActivity.user {
-                loadProfileWithUsername(username: user.username!)
+            if let profile = userActivity.profile {
+                loadProfileWithUsername(username: profile.username!)
             } else {
                 print("Error locating user in activity")
             }
@@ -85,9 +85,9 @@ class UserActivityViewController: UIViewController {
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         let profilePostVC = storyboard.instantiateViewController(withIdentifier: "ShowPost") as! ViewProfilePostController
         let post = dataDict["post"] as! Post
-        let user = dataDict["user"] as! User
+        let profile = dataDict["profile"] as! Profile
         profilePostVC.post = post
-        profilePostVC.user = user
+        profilePostVC.profile = profile
         
         self.navigationController?.pushViewController(profilePostVC, animated: true)
     }
@@ -97,8 +97,8 @@ class UserActivityViewController: UIViewController {
             let userActivity = activity[indexPath.row]
             
             if let post = userActivity.postReference {
-                authService.userFromId(id: post.userID!, completion: { (user) in
-                    let dataDict: [String: Any] = ["user": user, "post": post]
+                authService.userFromId(id: post.userID!, completion: { (profile) in
+                    let dataDict: [String: Any] = ["profile": profile, "post": post]
                     self.goToPost(dataDict: dataDict)
                 })
             } else {
@@ -116,7 +116,7 @@ extension UserActivityViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let userActivity = activity[indexPath.row]
         
-        guard let user = userActivity.user else {
+        guard let profile = userActivity.profile else {
             print("There was an error.")
             return UITableViewCell()
         }
@@ -141,7 +141,7 @@ extension UserActivityViewController: UITableViewDataSource {
             pictureReference.addGestureRecognizer(pictureReferenceTap)
             
             
-            if let url = URL(string: user.photoURL!) {
+            if let url = URL(string: profile.photoURL!) {
                 DispatchQueue.main.async {
                     self.downloadTask = profilePicture.loadImage(url: url)
                 }
@@ -157,9 +157,9 @@ extension UserActivityViewController: UITableViewDataSource {
             print("Activity Type: \(userActivity.activityType)") 
             
             if case .likes = userActivity.activityType {
-                referenceTextView.text = "\(user.username!) has liked your post!"
+                referenceTextView.text = "\(profile.username!) has liked your post!"
             } else if case .mentions = userActivity.activityType {
-                referenceTextView.text = "\(user.username!) has mentioned you in a post!"
+                referenceTextView.text = "\(profile.username!) has mentioned you in a post!"
             }
             
             referenceTextView.sizeToFit()
@@ -182,13 +182,13 @@ extension UserActivityViewController: UITableViewDataSource {
             profilePictureTap.numberOfTapsRequired = 1
             profilePicture.addGestureRecognizer(profilePictureTap)
             
-            if let url = URL(string: user.photoURL!) {
+            if let url = URL(string: profile.photoURL!) {
                 DispatchQueue.main.async {
                     self.downloadTask = profilePicture.loadImage(url: url)
                 }
             }
             
-            referenceTextView.text = "\(user.username!) began following you."
+            referenceTextView.text = "\(profile.username!) began following you."
             referenceTextView.sizeToFit()
             referenceTextView.textContainer.lineFragmentPadding = 0
             referenceTextView.textContainerInset = UIEdgeInsets.zero

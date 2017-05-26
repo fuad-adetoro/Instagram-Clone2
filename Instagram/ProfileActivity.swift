@@ -10,16 +10,16 @@ import UIKit
 import Firebase
 
 struct ProfileActivity {
-    let user: User
+    let profile: Profile
     let postService = PostService()
     let authService = AuthService()
     
-    var databaseRef: FIRDatabaseReference {
-        return FIRDatabase.database().reference()
+    var databaseRef: DatabaseReference {
+        return Database.database().reference()
     }
     
-    init(user: User) {
-        self.user = user
+    init(profile: Profile) {
+        self.profile = profile
     }
 
     func checkProfileActivity(completion: @escaping ([UserActivity]) -> Void) {
@@ -33,10 +33,10 @@ struct ProfileActivity {
         
         for userProfileActivity in activity {
             let userID = userProfileActivity.userID
-            authService.userFromId(id: userID, completion: { (user) in
+            authService.userFromId(id: userID, completion: { (profile) in
                 loopCount = loopCount + 1
                 var newActivity: UserActivity = userProfileActivity
-                newActivity.user = user
+                newActivity.profile = profile
                 userActivity.append(newActivity)
                 
                 if loopCount == activityCount {
@@ -51,13 +51,13 @@ struct ProfileActivity {
         var userActivity: [UserActivity] = activity
         print("Activity: \(userActivity)")
         
-        postService.fetchPosts(userID: user.userID!) { (posts) in
+        postService.fetchPosts(userID: profile.userID!) { (posts) in
             for post in posts {
                 if let likersDict = post.likers {
                     for (_, dict) in likersDict {
                         if let newLikersDict = dict as? [String: Any], let userID = newLikersDict["userID"] as? String, let timestamp = newLikersDict["timestamp"] as? TimeInterval {
                             // make sure we don't return notification for a user liking their own post
-                            if userID != self.user.userID! {
+                            if userID != self.profile.userID! {
                                 let usersActivity = UserActivity(timestamp: timestamp, userID: userID, activityType: .likes, postReference: post)
                                 userActivity.append(usersActivity)
                             }
@@ -71,12 +71,12 @@ struct ProfileActivity {
     }
     
     func searchFollowersActivity(activity: [UserActivity], completion: @escaping ([UserActivity]) -> Void) {
-        let userData = databaseRef.child("Users/\(user.userID!)/followers/")
+        let userData = databaseRef.child("Users/\(profile.userID!)/followers/")
         var userActivity: [UserActivity] = activity
         
         userData.observeSingleEvent(of: .value, with: { snapshot in
             for children in snapshot.children {
-                let childSnapshot = children as! FIRDataSnapshot
+                let childSnapshot = children as! DataSnapshot
                 let childSnapDict = childSnapshot.value as! NSDictionary
                 if let timestamp = childSnapDict["timestamp"] as? TimeInterval, let userID = childSnapDict["userID"] as? String {
                     let usersActivity = UserActivity(timestamp: timestamp, userID: userID, activityType: .followActivity, postReference: nil)
@@ -91,7 +91,7 @@ struct ProfileActivity {
     func searchPostsForMentions(completion: @escaping ([UserActivity]) -> Void) {
         let postData = databaseRef.child("Posts/")
         var userActivity: [UserActivity] = []
-        let username = user.username!
+        let username = profile.username!
         
         postData.observeSingleEvent(of: .value, with: { snapshot in
             let childLoopCount = Int(snapshot.childrenCount)
@@ -99,17 +99,17 @@ struct ProfileActivity {
             
             for child in snapshot.children {
                 loopCount = loopCount + 1
-                let snap = child as! FIRDataSnapshot
+                let snap = child as! DataSnapshot
                 
                 for children in snap.children {
-                    let childSnap = children as! FIRDataSnapshot
+                    let childSnap = children as! DataSnapshot
                     let childSnapDict = childSnap.value as! NSDictionary
                     if childSnapDict["userID"] != nil {
                         let post = Post(snapshot: childSnap)
                         
                         if let mentions = post.mentions {
                             for usernames in mentions.components(separatedBy: " ") {
-                                if usernames == "@\(username)", post.userID! != self.user.userID! {
+                                if usernames == "@\(username)", post.userID! != self.profile.userID! {
                                     let usersActivity = UserActivity(timestamp: post.timestamp!, userID: post.userID!, activityType: .mentions, postReference: post)
                                     userActivity.append(usersActivity)
                                 }

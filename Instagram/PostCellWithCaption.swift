@@ -24,7 +24,7 @@ class PostCellWithCaption: UICollectionViewCell {
     var downloadTask: URLSessionDownloadTask!
 
     var currentPost: Post?
-    let user = FIRAuth.auth()?.currentUser
+    let user = Auth.auth().currentUser
     let postService = PostService()
     let authService = AuthService()
     
@@ -40,7 +40,7 @@ class PostCellWithCaption: UICollectionViewCell {
         }
     }
     
-    func savePost(post: Post, user: FIRUser) {
+    func savePost(post: Post, user: User) {
         postService.savePost(post: post, currentUser: user) { (saved) in
             if saved {
                 self.saveButton.setImage(#imageLiteral(resourceName: "savedpicture"), for: .normal)
@@ -48,7 +48,7 @@ class PostCellWithCaption: UICollectionViewCell {
         }
     }
     
-    func unSavePost(post: Post, user: FIRUser) {
+    func unSavePost(post: Post, user: User) {
         postService.unSavePost(post: post, currentUser: user) { (unSaved) in
             if unSaved {
                 self.saveButton.setImage(#imageLiteral(resourceName: "savepicture"), for: .normal)
@@ -173,13 +173,13 @@ class PostCellWithCaption: UICollectionViewCell {
     }
     
     func setupProfilePicture(userID: String) {
-        var storageRef: FIRStorage {
-            return FIRStorage.storage()
+        var storageRef: Storage {
+            return Storage.storage()
         }
         
-        authService.userFromId(id: userID) { (user) in
-            if let profilePicture = user.photoURL {
-                storageRef.reference(forURL: profilePicture).data(withMaxSize: 5 * 1024 * 1024, completion: { (imgData, error) in
+        authService.userFromId(id: userID) { profile in
+            if let profilePicture = profile.photoURL {
+                storageRef.reference(forURL: profilePicture).getData(maxSize: 5 * 1024 * 1024, completion: { (imgData, error) in
                     if error == nil {
                         if let image = imgData {
                             DispatchQueue.main.async {

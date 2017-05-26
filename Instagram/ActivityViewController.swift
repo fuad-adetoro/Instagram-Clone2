@@ -20,15 +20,15 @@ class ActivityViewController: UIViewController {
     }
     
     var post: Post?
-    var user: User?
+    var profile: Profile?
     
     var activity: Activity = .likes
     
-    var users: [User] = []
+    var profiles: [Profile] = []
     
     let postService = PostService()
     let accountService = AccountService()
-    let currentUser = FIRAuth.auth()?.currentUser
+    let currentUser = Auth.auth().currentUser
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -70,37 +70,37 @@ class ActivityViewController: UIViewController {
             if let refreshCtrl = self.tableView.viewWithTag(93) as? UIRefreshControl {
                 refreshCtrl.beginRefreshing()
             
-                postService.fetchPostLikes(post: post!, completion: { (users) in
-                    self.reloadData(with: users, refreshControl: refreshCtrl)
+                postService.fetchPostLikes(post: post!, completion: { (profiles) in
+                    self.reloadData(with: profiles, refreshControl: refreshCtrl)
                 })
             }
         }
     }
     
     func refreshFollowers() {
-        if user != nil {
+        if profile != nil {
             if let refreshCtrl = self.tableView.viewWithTag(94) as? UIRefreshControl {
                 refreshCtrl.beginRefreshing()
-                accountService.fetchFollowers(user: user!, completion: { (users) in
-                    self.reloadData(with: users, refreshControl: refreshCtrl)
+                accountService.fetchFollowers(profile: profile!, completion: { (profiles) in
+                    self.reloadData(with: profiles, refreshControl: refreshCtrl)
                 })
             }
         }
     }
     
     func refreshFollowing() {
-        if user != nil {
+        if profile != nil {
             if let refreshCtrl = self.tableView.viewWithTag(95) as? UIRefreshControl {
                 refreshCtrl.beginRefreshing()
-                accountService.fetchFollowing(user: user!, completion: { (users) in
-                    self.reloadData(with: users, refreshControl: refreshCtrl)
+                accountService.fetchFollowing(profile: profile!, completion: { (profiles) in
+                    self.reloadData(with: profiles, refreshControl: refreshCtrl)
                 })
             }
         }
     }
     
-    func reloadData(with users: [User], refreshControl: UIRefreshControl) {
-        self.users = users
+    func reloadData(with profiles: [Profile], refreshControl: UIRefreshControl) {
+        self.profiles = profiles
         refreshControl.endRefreshing()
         self.tableView.reloadData()
     }
@@ -112,15 +112,15 @@ extension ActivityViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return users.count
+        return profiles.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "PostLikers", for: indexPath) as! PostLikers
         
-        let user = users[indexPath.row]
+        let profile = profiles[indexPath.row]
         
-        cell.configure(user: user)
+        cell.configure(profile: profile)
         
         return cell
     }
@@ -133,13 +133,13 @@ class PostLikers: UITableViewCell {
     @IBOutlet weak var followButton: UIButton!
     
     @IBAction func followTapped(_ sender: Any) {
-        if user != nil, currentUser != nil {
+        if profile != nil, currentUser != nil {
             if isFollowing {
-                accountService.unFollowUser(userID: user!.userID!, currentUser: currentUser!)
+                accountService.unFollowUser(userID: profile!.userID!, currentUser: currentUser!)
                 followButton.setTitle("Follow", for: .normal)
                 isFollowing = false
             } else {
-                accountService.followUser(userID: user!.userID!, currentUser: currentUser!)
+                accountService.followUser(userID: profile!.userID!, currentUser: currentUser!)
                 followButton.setTitle("Following", for: .normal)
                 isFollowing = true
             }
@@ -155,25 +155,25 @@ class PostLikers: UITableViewCell {
     var isFollowing = false
     let accountService = AccountService()
     let postService = PostService()
-    let currentUser = FIRAuth.auth()?.currentUser
-    var user: User?
+    let currentUser = Auth.auth().currentUser
+    var profile: Profile?
     
-    func configure(user: User) {
-        self.user = user
-        usernameLabel.text = user.username!
+    func configure(profile: Profile) {
+        self.profile = profile
+        usernameLabel.text = profile.username!
         
-        if let displayName = user.name {
+        if let displayName = profile.name {
             displayNameLabel.text = displayName
         }
         
-        postService.retrieveProfilePicture(userID: user.userID!) { (profilePicture) in
+        postService.retrieveProfilePicture(userID: profile.userID!) { (profilePicture) in
             DispatchQueue.main.async {
                 self.profilePicture.image = profilePicture
             }
         }
         
-        if user.userID! != currentUser!.uid {
-            accountService.isFollowingUser(userID: user.userID!, currentUserID: currentUser!.uid) {     (following) in
+        if profile.userID! != currentUser!.uid {
+            accountService.isFollowingUser(userID: profile.userID!, currentUserID: currentUser!.uid) {     (following) in
                 if following {
                     self.isFollowing = true
                     self.followButton.setTitle("Following", for: .normal)
@@ -191,10 +191,10 @@ class PostLikers: UITableViewCell {
 
 extension ActivityViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let user = users[indexPath.row]
+        let profile = profiles[indexPath.row]
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         let viewUserProfileVC = storyboard.instantiateViewController(withIdentifier: "ViewUserProfile") as! ViewUserProfileViewController
-        viewUserProfileVC.user = user
+        viewUserProfileVC.profile = profile
         
         self.navigationController?.pushViewController(viewUserProfileVC, animated: true)
     }

@@ -9,7 +9,7 @@
 import UIKit
 import Firebase
 
-struct User {
+struct Profile {
     var username: String!
     var email: String!
     var name: String?
@@ -23,11 +23,11 @@ struct User {
     var following: [String: Any]?
     var followers: [String: Any]?
     
-    var databaseRef: FIRDatabaseReference {
-        return FIRDatabase.database().reference()
+    var databaseRef: DatabaseReference {
+        return Database.database().reference()
     }
     
-    init(snapshot: FIRDataSnapshot) {
+    init(snapshot: DataSnapshot) {
         username = (snapshot.value! as! NSDictionary)["username"] as! String
         email = (snapshot.value! as! NSDictionary)["email"] as! String
         name = (snapshot.value! as! NSDictionary)["fullName"] as? String

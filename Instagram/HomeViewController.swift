@@ -22,7 +22,7 @@ class HomeViewController: UIViewController {
     var posts: [Post] = []
     var images: [String: UIImage] = [:]
     var profilePicURL: String?
-    let currentUser = FIRAuth.auth()?.currentUser
+    let currentUser = Auth.auth().currentUser
     
     // Loading "PostCellWithCaption" nib to postCellCaptionNib and forcing it to be an NSArray
     let postCellCaptionNib = Bundle.main.loadNibNamed("PostCellWithCaption", owner: PostCellWithCaption.self, options: nil)! as NSArray
@@ -81,14 +81,14 @@ class HomeViewController: UIViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "ViewUserProfile" {
             let viewUserProfileVC = segue.destination as! ViewUserProfileViewController
-            let user = sender as! User
-            viewUserProfileVC.user = user
+            let profile = sender as! Profile
+            viewUserProfileVC.profile = profile
         } else if segue.identifier == "ActivityControl" {
             let activityVC = segue.destination as! ActivityViewController
             let dataDict = sender as! [String: Any]
-            let users = dataDict["users"] as! [User]
+            let profiles = dataDict["profiles"] as! [Profile]
             let post = dataDict["post"] as! Post
-            activityVC.users = users
+            activityVC.profiles = profiles
             activityVC.post = post
             activityVC.activity = .likes
         } else if segue.identifier == "hashtagController" {
@@ -120,8 +120,8 @@ class HomeViewController: UIViewController {
         let row = indexPath?.row
         print("ROW: \(row!)")
         let post = posts[row!]
-        postService.userFromId(id: post.userID!) { (user) in
-            self.performSegue(withIdentifier: "ViewUserProfile", sender: user)
+        postService.userFromId(id: post.userID!) { (profile) in
+            self.performSegue(withIdentifier: "ViewUserProfile", sender: profile)
         }
     }
     
@@ -136,8 +136,8 @@ class HomeViewController: UIViewController {
     }
     
     func loadProfileWithUsername(username: String) {
-        accountService.fetchUserWithUsername(username: username) { (user) in
-            self.performSegue(withIdentifier: "ViewUserProfile", sender: user)
+        accountService.fetchUserWithUsername(username: username) { (profile) in
+            self.performSegue(withIdentifier: "ViewUserProfile", sender: profile)
         }
     }
     
@@ -152,9 +152,9 @@ class HomeViewController: UIViewController {
     func displayLikesController(_ sender: UITapGestureRecognizer) {
         if let indexPath = self.profileCollectionView.indexPathForItem(at: sender.location(in: self.profileCollectionView)) {
             let post = posts[indexPath.row]
-            postService.fetchPostLikes(post: post, completion: { (users) in
-                if !users.isEmpty {
-                    let dataDict: [String: Any] = ["users": users, "post": post]
+            postService.fetchPostLikes(post: post, completion: { (profiles) in
+                if !profiles.isEmpty {
+                    let dataDict: [String: Any] = ["profiles": profiles, "post": post]
                     self.performSegue(withIdentifier: "ActivityControl", sender: dataDict)
                 }
             })

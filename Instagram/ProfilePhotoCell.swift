@@ -17,11 +17,11 @@ class ProfilePhotoCell: UICollectionViewCell {
     }
     
     func configure(post: Post) {
-        var storageRef: FIRStorage {
-            return FIRStorage.storage()
+        var storageRef: Storage {
+            return Storage.storage()
         }
         
-        storageRef.reference(forURL: post.imageURL!).data(withMaxSize: 5 * 1024 * 1024) { (imgData, error) in
+        storageRef.reference(forURL: post.imageURL!).getData(maxSize: 5 * 1024 * 1024, completion: { (imgData, error) in
             if let error = error as? NSError {
                 print(error.localizedDescription)
             } else {
@@ -29,6 +29,6 @@ class ProfilePhotoCell: UICollectionViewCell {
                     self.usersUploadedPhoto.image = UIImage(data: image)
                 }
             }
-        }
+        })
     }
 }

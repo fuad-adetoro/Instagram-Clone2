@@ -9,24 +9,24 @@
 import UIKit
 import Firebase
 
-typealias SignUpCompletion = (FIRUser?, Error?) -> Void
+typealias SignUpCompletion = (User?, Error?) -> Void
 typealias Completion = (Any) -> Void
 typealias BoolCompletion = (Bool) -> Void
 typealias ResetCompletion = (Any, Bool?) -> Void
-typealias AccountExists = (FIRUser) -> Void
+typealias AccountExists = (User) -> Void
 
 struct AuthService {
     
-    var databaseRef: FIRDatabaseReference {
-        return FIRDatabase.database().reference()
+    var databaseRef: DatabaseReference {
+        return Database.database().reference()
     }
     
-    var storageRef: FIRStorageReference {
-        return FIRStorage.storage().reference()
+    var storageRef: StorageReference {
+        return Storage.storage().reference()
     }
     
     func logUserIn(email: String, password: String, completion: @escaping Completion) {
-        FIRAuth.auth()?.signIn(withEmail: email, password: password, completion: { (user, error) in
+        Auth.auth().signIn(withEmail: email, password: password, completion: { (user, error) in
             if let error = error as NSError! {
                 completion(error)
             } else {
@@ -39,14 +39,14 @@ struct AuthService {
     }
     
     func resetPassword(email: String, completion: @escaping Completion) {
-        FIRAuth.auth()?.sendPasswordReset(withEmail: email, completion: completion)
+        Auth.auth().sendPasswordReset(withEmail: email, completion: completion)
     }
     
     func signUserUp(email: String, password: String, username: String, completion: @escaping SignUpCompletion) {
-        FIRAuth.auth()?.createUser(withEmail: email, password: password, completion: completion)
+        Auth.auth().createUser(withEmail: email, password: password, completion: completion)
     }
     
-    func saveUserInfo(user: FIRUser, email: String, username: String, phoneNumber: String?) {
+    func saveUserInfo(user: User, email: String, username: String, phoneNumber: String?) {
         // userInfo is the data that we will create and upload to the userData
         var userInfo: [String: Any] = [:]
         
@@ -61,7 +61,7 @@ struct AuthService {
         userData.setValue(userInfo) { (error, reference) in
             if error == nil {
                 // Updating the FIRUser's firebase display name
-                let changeRequest = user.profileChangeRequest()
+                let changeRequest = user.createProfileChangeRequest()
                 changeRequest.displayName = username
                 print("User Details Saved Successfully!")
             } else {
@@ -70,20 +70,20 @@ struct AuthService {
         }
     }
     
-    func updateProfilePhoto(user: FIRUser, picture: UIImage) {
+    func updateProfilePhoto(user: User, picture: UIImage) {
         print("updateProfilePhoto")
         let data = UIImageJPEGRepresentation(picture, 5 * 1024 * 1024)! as NSData
         
         // Profile Picture Reference
         let imageRef = storageRef.child("ProfileImages/").child(user.uid).child("profile_picture.jpg")
         
-        let metaData = FIRStorageMetadata()
+        let metaData = StorageMetadata()
         metaData.contentType = "image/jpeg"
         
         // Updating the user's profile picture
-        imageRef.put(data as Data, metadata: metaData) { (newMetaData, error) in
+        imageRef.putData(data as Data, metadata: metaData) { (newMetaData, error) in
             if error == nil {
-                let changeRequest = user.profileChangeRequest()
+                let changeRequest = user.createProfileChangeRequest()
                 
                 if let photoURL = newMetaData!.downloadURL() {
                     changeRequest.photoURL = photoURL
@@ -114,14 +114,14 @@ struct AuthService {
         }
     }
     
-    typealias SaveCompletion = (Error?, FIRDatabaseReference) -> Void
+    typealias SaveCompletion = (Error?, DatabaseReference) -> Void
     
     func saveAdditionalUserInfo(userInfo: [String: Any], path: String, completion: @escaping SaveCompletion) {
         
         databaseRef.child("\(path)").updateChildValues(userInfo, withCompletionBlock: completion)
     }
     
-    func reupdateEmail(user: FIRUser, email: String, completion: @escaping UpdateEmail) {
+    func reupdateEmail(user: User, email: String, completion: @escaping UpdateEmail) {
         // new email dict
         let emailUserInfo = ["email": email.lowercased()]
         
@@ -132,7 +132,7 @@ struct AuthService {
             
             // If email doesn't exist canUpdate
             if canUpdate {
-                user.updateEmail(email, completion: { (error) in
+                user.updateEmail(to: email, completion: { (error) in
                     if let error = error as? NSError {
                         if error.code == 17014 {
                             print("User needs to reauthenticate")
@@ -165,7 +165,7 @@ struct AuthService {
     
     typealias UpdateEmail = (Any) -> Void
     
-    func updateEmail(user: FIRUser, email: String, completion: @escaping UpdateEmail) {
+    func updateEmail(user: User, email: String, completion: @escaping UpdateEmail) {
         
         let userInfo = ["email": email.lowercased()]
         
@@ -177,7 +177,7 @@ struct AuthService {
                     if error == nil {
                         userData.child("phoneNumberEmail").removeValue()
                         
-                        user.updateEmail(email, completion: { (error) in
+                        user.updateEmail(to: email, completion: { (error) in
                             if error == nil {
                                 print("Email successfully updated!")
                             } else {
@@ -204,7 +204,7 @@ struct AuthService {
     func emailExists(email: String, completion: @escaping BoolCompletion) {
         var canRegister = false
         
-        FIRAuth.auth()?.signIn(withEmail: email, password: " ", completion: { (user, error) in
+        Auth.auth().signIn(withEmail: email, password: " ", completion: { (user, error) in
             if let error = error as? NSError {
                 if error.code == 17009 {
                     canRegister = false
@@ -223,14 +223,16 @@ struct AuthService {
         databaseRef.child("Users/").observeSingleEvent(of: .value, with: { (snapshot) in
             if snapshot.exists() {
                 for child in snapshot.children {
-                    let user = User(snapshot: child as! FIRDataSnapshot)
+                    let profile = Profile(snapshot: child as! DataSnapshot)
                 
                     if canRegister == true {
-                        if user.username! == username {
+                        if profile.username! == username {
                             canRegister = false
                         } else {
                             canRegister = true
                         }
+                    } else {
+                        completion(canRegister)
                     }
                 }
             }
@@ -245,9 +247,9 @@ struct AuthService {
         databaseRef.child("Users/").observeSingleEvent(of: .value, with: { snapshot in
             if snapshot.exists() {
                 for child in snapshot.children {
-                    let user = User(snapshot: child as! FIRDataSnapshot)
+                    let profile = Profile(snapshot: child as! DataSnapshot)
                     
-                    if user.phoneNumber == "0\(phoneNumber)" {
+                    if profile.phoneNumber == "0\(phoneNumber)" {
                         canRegister = false
                         completion(canRegister)
                         return
@@ -267,10 +269,10 @@ struct AuthService {
             var accountFound = false
             
             for children in snapshot.children {
-                let user = User(snapshot: children as! FIRDataSnapshot)
+                let profile = Profile(snapshot: children as! DataSnapshot)
                 
-                if username == user.username! {
-                    let email = user.email
+                if username == profile.username! {
+                    let email = profile.email
                     
                     accountFound = true
                     
@@ -297,18 +299,18 @@ struct AuthService {
             var accountFound = false
             
             for children in snapshot.children {
-                let user = User(snapshot: children as! FIRDataSnapshot)
+                let profile = Profile(snapshot: children as! DataSnapshot)
                 
-                if phoneNumber == user.phoneNumber {
+                if phoneNumber == profile.phoneNumber {
                     accountFound = true
-                    let email = user.email!
+                    let email = profile.email!
                     
                     self.logUserIn(email: email, password: password, completion: { (error) in
                         if let error = error as? NSError {
                             completion(error)
                             return
                         } else {
-                            if let phoneNumberEmail = user.phoneNumberEmail {
+                            if let phoneNumberEmail = profile.phoneNumberEmail {
                                 completion(true)
                                 return
                             } else {
@@ -327,7 +329,7 @@ struct AuthService {
     }
     
     func createAccountWithPhoneNumber(phoneNumber: String, password: String, completion: @escaping SignUpCompletion) {
-        FIRAuth.auth()?.createUser(withEmail: "\(phoneNumber)@instagram.com", password: password, completion: completion)
+        Auth.auth().createUser(withEmail: "\(phoneNumber)@instagram.com", password: password, completion: completion)
     }
     
     
@@ -336,12 +338,12 @@ struct AuthService {
     func resetPasswordWithUsername(username: String, completion: @escaping Completion) {
         databaseRef.child("Users/").observeSingleEvent(of: .value, with: { snapshot in
             for children in snapshot.children {
-                let user = User(snapshot: children as! FIRDataSnapshot)
+                let profile = Profile(snapshot: children as! DataSnapshot)
                 
-                if username == user.username! {
-                    let email = user.email!
+                if username == profile.username! {
+                    let email = profile.email!
                     
-                    FIRAuth.auth()?.sendPasswordReset(withEmail: email, completion: { (error) in
+                    Auth.auth().sendPasswordReset(withEmail: email, completion: { (error) in
                         if let error = error as? NSError {
                             completion(error)
                         } else {
@@ -359,18 +361,18 @@ struct AuthService {
             var accountFound = false
             
             for children in snapshot.children {
-                let user = User(snapshot: children as! FIRDataSnapshot)
+                let profile = Profile(snapshot: children as! DataSnapshot)
                 
-                if let number = user.phoneNumber, phoneNumber == number {
+                if let number = profile.phoneNumber, phoneNumber == number {
                     accountFound = true
-                    let email = user.email!
+                    let email = profile.email!
                     
-                    FIRAuth.auth()?.sendPasswordReset(withEmail: email, completion: { (error) in
+                    Auth.auth().sendPasswordReset(withEmail: email, completion: { (error) in
                         if let error = error as? NSError {
                             completion(error, nil)
                         } else {
                             
-                            if let phoneNumberEmail = user.phoneNumberEmail {
+                            if let phoneNumberEmail = profile.phoneNumberEmail {
                                 completion(true, phoneNumberEmail)
                                 print("Forgot Password not sent.")
                             } else {
@@ -390,25 +392,25 @@ struct AuthService {
         })
     }
     
-    typealias CapturedUser = (User) -> Void
+    typealias CapturedUser = (Profile) -> Void
     
-    func captureUser(user: FIRUser, completion: @escaping CapturedUser) {
+    func captureUser(user: User, completion: @escaping CapturedUser) {
         let userData = databaseRef.child("Users/\(user.uid)/")
         
         userData.observeSingleEvent(of: .value, with: { snapshot in
-            let user = User(snapshot: snapshot)
-            completion(user)
+            let profile = Profile(snapshot: snapshot)
+            completion(profile)
         })
     }
     
     typealias ImageReceived = (UIImage) -> Void
     
     func retrieveProfilePicture(pictureURL: String, completion: @escaping ImageReceived) {
-        var newStorageRef: FIRStorage {
-            return FIRStorage.storage()
+        var newStorageRef: Storage {
+            return Storage.storage()
         }
         
-        newStorageRef.reference(forURL: pictureURL).data(withMaxSize: 5 * 1024 * 1024) { (imgData, error) in
+        newStorageRef.reference(forURL: pictureURL).getData(maxSize: 5 * 1024 * 1024) { (imgData, error) in
             if error == nil {
                 if imgData != nil, let image = UIImage(data: imgData!) {
                     DispatchQueue.main.async {
@@ -421,31 +423,31 @@ struct AuthService {
         }
     }
     
-    typealias UserFound = (User) -> Void
+    typealias ProfileFound = (Profile) -> Void
     
-    func fetchUser(user: FIRUser, completion: @escaping UserFound) {
+    func fetchUser(user: User, completion: @escaping ProfileFound) {
         let userData = databaseRef.child("Users/\(user.uid)")
         userData.observeSingleEvent(of: .value, with: { snapshot in
-            let user = User(snapshot: snapshot)
-            completion(user)
+            let capturedProfile = Profile(snapshot: snapshot)
+            completion(capturedProfile)
         })
     }
     
-    func userFromId(id: String, completion: @escaping UserFound) {
+    func userFromId(id: String, completion: @escaping ProfileFound) {
         let userData = databaseRef.child("Users/\(id)/")
         
         userData.observeSingleEvent(of: .value, with: { snapshot in
-            let capturedUser = User(snapshot: snapshot)
-            completion(capturedUser)
+            let capturedProfile = Profile(snapshot: snapshot)
+            completion(capturedProfile)
         })
     }
     
     typealias UserLogout = (Any) -> Void
     
-    func logUserOut(currentUser: FIRUser?, completion: @escaping UserLogout) {
+    func logUserOut(currentUser: User?, completion: @escaping UserLogout) {
         if currentUser != nil {
             do {
-                try? FIRAuth.auth()?.signOut()
+                try? Auth.auth().signOut()
                 completion(true)
             } catch let error {
                 print("Error logging out! \(error)")

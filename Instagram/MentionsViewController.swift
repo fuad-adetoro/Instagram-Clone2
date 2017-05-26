@@ -45,9 +45,9 @@ class MentionsViewController: UIViewController {
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         let profilePostVC = storyboard.instantiateViewController(withIdentifier: "ShowPost") as! ViewProfilePostController
         let post = dataDict["post"] as! Post
-        let user = dataDict["user"] as! User
+        let profile = dataDict["profile"] as! Profile
         profilePostVC.post = post
-        profilePostVC.user = user
+        profilePostVC.profile = profile
         
         self.navigationController?.pushViewController(profilePostVC, animated: true)
     }
@@ -86,8 +86,8 @@ extension MentionsViewController: UICollectionViewDataSource {
 extension MentionsViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {        
         let post = posts[indexPath.row]
-        postService.userFromId(id: post.userID!, completion: { (user) in
-            let dataDict: [String: Any] = ["user": user, "post": post]
+        postService.userFromId(id: post.userID!, completion: { (profile) in
+            let dataDict: [String: Any] = ["profile": profile, "post": post]
             self.goToPost(dataDict: dataDict)
         })
     }

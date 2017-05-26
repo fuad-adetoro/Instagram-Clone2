@@ -11,13 +11,13 @@ import Firebase
 
 struct AccountService {
     
-    typealias UserFetchComplete = (User) -> Void
+    typealias ProfileFetchComplete = (Profile) -> Void
     
-    var databaseRef: FIRDatabaseReference {
-        return FIRDatabase.database().reference()
+    var databaseRef: DatabaseReference {
+        return Database.database().reference()
     }
     
-    func followUser(userID: String, currentUser: FIRUser) {
+    func followUser(userID: String, currentUser: User) {
         let followDict: [String: Any] = [userID: true]
         let followTimestamp = Date().timeIntervalSince1970
         let followersDict: [String: Any] = ["userID": currentUser.uid, "timestamp": followTimestamp]
@@ -31,7 +31,7 @@ struct AccountService {
         
     }
     
-    func unFollowUser(userID: String, currentUser: FIRUser) {
+    func unFollowUser(userID: String, currentUser: User) {
         let followingData = databaseRef.child("Users/\(currentUser.uid)/following/\(userID)")
         let followersData = databaseRef.child("Users/\(userID)/followers/\(currentUser.uid)")
         
@@ -41,10 +41,10 @@ struct AccountService {
         followersData.removeValue()
     }
     
-    typealias FollowersFetched = ([User]) -> Void
+    typealias FollowersFetched = ([Profile]) -> Void
     
-    func fetchFollowing(user: User, completion: @escaping FollowersFetched) {
-        let childData = databaseRef.child("Users/\(user.userID!)/following/")
+    func fetchFollowing(profile: Profile, completion: @escaping FollowersFetched) {
+        let childData = databaseRef.child("Users/\(profile.userID!)/following/")
         
         childData.observeSingleEvent(of: .value, with: { snapshot in
             // Checking if data exists
@@ -52,17 +52,17 @@ struct AccountService {
                 let snapDict = snapshot.value as! [String: Any]
                 let snapDictCount = snapDict.count
                 var loopCount = 0
-                var users: [User] = []
+                var profiles: [Profile] = []
                 for (userID, _) in snapDict {
                     let postService = PostService()
                     // Fetching users using the userID from snapDict and appending it to the users array
-                    postService.userFromId(id: userID, completion: { (user) in
+                    postService.userFromId(id: userID, completion: { (profile) in
                         loopCount = loopCount + 1
-                        users.append(user)
+                        profiles.append(profile)
                         
                         if loopCount == snapDictCount {
                             // Once loop is complete completion will be called.
-                            completion(users)
+                            completion(profiles)
                         }
                     })
                 }
@@ -70,8 +70,8 @@ struct AccountService {
         })
     }
     
-    func fetchFollowers(user: User, completion: @escaping FollowersFetched) {
-        let childData = databaseRef.child("Users/\(user.userID!)/followers/")
+    func fetchFollowers(profile: Profile, completion: @escaping FollowersFetched) {
+        let childData = databaseRef.child("Users/\(profile.userID!)/followers/")
         
         childData.observeSingleEvent(of: .value, with: { snapshot in
             // Checking if data exists
@@ -79,17 +79,17 @@ struct AccountService {
                 let snapDict = snapshot.value as! [String: Any]
                 let snapDictCount = snapDict.count
                 var loopCount = 0
-                var users: [User] = []
+                var profiles: [Profile] = []
                 for (userID, _) in snapDict {
                     let postService = PostService()
                     // Fetching users using the userID from snapDict and appending it to the users array
                     postService.userFromId(id: userID, completion: { (user) in
                         loopCount = loopCount + 1
-                        users.append(user)
+                        profiles.append(profile)
                         
                         if loopCount == snapDictCount {
                             // Once loop is complete completion will be called.
-                            completion(users)
+                            completion(profiles)
                         }
                     })
                 }
@@ -97,25 +97,25 @@ struct AccountService {
         })
     }
     
-    func fetchUserWithUsername(username: String, completion: @escaping UserFetchComplete) {
+    func fetchUserWithUsername(username: String, completion: @escaping ProfileFetchComplete) {
         let userData = databaseRef.child("Users/")
         
         userData.observeSingleEvent(of: .value, with: { snapshot in
             // Searching "Users/" which will have children if it's not empty
             for children in snapshot.children {
                 // if children is found then we cast the child as a User
-                let user = User(snapshot: children as! FIRDataSnapshot)
+                let profile = Profile(snapshot: children as! DataSnapshot)
                 
-                if user.username! == username {
+                if profile.username! == username {
                     // If the username equals the username being passed to the function the completion will be called.
-                    completion(user)
+                    completion(profile)
                 }
             }
         })
     }
     
     func isFollowingUser(userID: String, currentUserID: String, completion: @escaping (Bool) -> Void) {
-        let userData = FIRDatabase.database().reference(withPath: "Users/\(currentUserID)/following/\(userID)")
+        let userData = Database.database().reference(withPath: "Users/\(currentUserID)/following/\(userID)")
         
         userData.observeSingleEvent(of: .value, with: { snapshot in
             if snapshot.exists() {
@@ -128,27 +128,25 @@ struct AccountService {
     
     func searchUsers(searchText: String, completion: @escaping FollowersFetched) {
         let userData = databaseRef.child("Users/")
-        var users: [User] = []
+        var profiles: [Profile] = []
         
         userData.observeSingleEvent(of: .value, with: { snapshot in
             for child in snapshot.children {
                 // if children is found then we cast the child as a User
-                let user = User(snapshot: child as! FIRDataSnapshot)
-                print("UserData: \(user.username!)")
+                let profile = Profile(snapshot: child as! DataSnapshot)
+                print("UserData: \(profile.username!)")
                 // lowercase the name as all usernames will be lowercased
                 let lowercasedSearchText = searchText.lowercased()
                 
                 // If the found user's username name includes the searchText which was passed then append users
-                if user.username!.contains(lowercasedSearchText) {
-                    users.append(user)
-                } else if let name = user.name, name.contains(lowercasedSearchText) {
-                    users.append(user)
+                if profile.username!.contains(lowercasedSearchText) {
+                    profiles.append(profile)
+                } else if let name = profile.name, name.contains(lowercasedSearchText) {
+                    profiles.append(profile)
                 }
             }
-            
-            print("Users: \(users)")
-            
-            completion(users)
+                        
+            completion(profiles)
         })
     }
     

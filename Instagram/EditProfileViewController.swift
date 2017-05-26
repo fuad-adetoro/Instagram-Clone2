@@ -24,7 +24,7 @@ class EditProfileViewController: UITableViewController {
     var phoneNumber: String?
     
     var image: UIImage?
-    var user: FIRUser!
+    var user: User!
     let authService = AuthService()
     
     @IBAction func cancelAction(_ sender: Any) {
@@ -94,7 +94,7 @@ class EditProfileViewController: UITableViewController {
                             alert.addAction(okAction)
                             self.present(alert, animated: true, completion: nil)
                         }
-                    } else if let reference = status as? FIRDatabaseReference {
+                    } else if let reference = status as? DatabaseReference {
                         print(reference)
                     } else if let canUpdate = status as? Bool {
                         print(canUpdate)
@@ -144,39 +144,39 @@ class EditProfileViewController: UITableViewController {
     }
     
     func setupFields() {
-        authService.captureUser(user: self.user) { (user) in
-            self.usernameField.text = user.username!
-            self.username = user.username!
-            let email = user.email
+        authService.captureUser(user: self.user) { (profile) in
+            self.usernameField.text = profile.username!
+            self.username = profile.username!
+            let email = profile.email
             
-            if user.phoneNumberEmail == nil {
+            if profile.phoneNumberEmail == nil {
                 self.emailField.text = email!
             }
             
-            if let displayName = user.name {
+            if let displayName = profile.name {
                 self.displayNameField.text = displayName
             }
             
-            if let website = user.website {
+            if let website = profile.website {
                 self.websiteField.text = website
             }
             
-            if let bio = user.biograph {
+            if let bio = profile.biograph {
                 self.biographyField.text = bio
             }
             
-            if let phoneNumber = user.phoneNumber {
+            if let phoneNumber = profile.phoneNumber {
                 self.phoneNumberField.text = phoneNumber
             }
             
-            if let gender = user.gender {
+            if let gender = profile.gender {
                 self.genderField.text = gender
             } else {
                 self.genderField.text = "Not Specified"
             }
             
-            if let photoURL = user.photoURL {
-                self.authService.retrieveProfilePicture(pictureURL: photoURL, completion: { (image) in
+            if let photoURL = profile.photoURL {
+                self.authService.retrieveProfilePicture(pictureURL: "\(photoURL)", completion: { (image) in
                     let imageView = self.tableView.viewWithTag(1996) as! UIImageView
                     DispatchQueue.main.async {
                         imageView.image = image

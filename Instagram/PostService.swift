@@ -10,17 +10,17 @@ import UIKit
 import Firebase
 
 struct PostService {
-    var databaseRef: FIRDatabaseReference {
-        return FIRDatabase.database().reference()
+    var databaseRef: DatabaseReference {
+        return Database.database().reference()
     }
     
-    var storageRef: FIRStorageReference {
-        return FIRStorage.storage().reference()
+    var storageRef: StorageReference {
+        return Storage.storage().reference()
     }
     
     typealias PostUploaded = (Bool) -> Void
     
-    func createPost(picture: UIImage, caption: String, user: FIRUser, completion: @escaping PostUploaded) {
+    func createPost(picture: UIImage, caption: String, user: User, completion: @escaping PostUploaded) {
         var noCaption = true
         var hashtags: [String] = []
         var mentions: [String] = []
@@ -45,16 +45,16 @@ struct PostService {
         
         let randomKey = databaseRef.child("Users/").childByAutoId().key
         
-        let imageRef = storageRef.child("Posts/").child(user.uid).child(randomKey)
-        
-        let metaData = FIRStorageMetadata()
+        let imageRef = storageRef.child("Posts/\(user.uid)/\(randomKey)")
+
+        let metaData = StorageMetadata()
         metaData.contentType = "image/jpeg"
         
-        imageRef.put(data as Data, metadata: metaData) { (newMetaData, error) in
+        imageRef.putData(data as Data, metadata: metaData) { (newMetaData, error) in
             if error == nil {
                 let photoURL = newMetaData!.downloadURL()
-                self.userFromId(id: user.uid, completion: { (user) in
-                    self.createPostInDatabase(noCaption: noCaption, caption: caption, imageURL: String(describing: photoURL!), user: user, key: randomKey, timestamp: postTimestamp, hashtags: hashtags, mentions: mentions)
+                self.userFromId(id: user.uid, completion: { (profile) in
+                    self.createPostInDatabase(noCaption: noCaption, caption: caption, imageURL: String(describing: photoURL!), profile: profile, key: randomKey, timestamp: postTimestamp, hashtags: hashtags, mentions: mentions)
                     completion(true)
                 })
             } else {
@@ -64,7 +64,7 @@ struct PostService {
         }
     }
     
-    func createPostInDatabase(noCaption: Bool, caption: String, imageURL: String, user: User, key: String, timestamp: TimeInterval, hashtags: [String], mentions: [String]) {
+    func createPostInDatabase(noCaption: Bool, caption: String, imageURL: String, profile: Profile, key: String, timestamp: TimeInterval, hashtags: [String], mentions: [String]) {
         let dictToUpload: [String: Any]
         
         print("timestamp: \(timestamp)")  
@@ -73,23 +73,23 @@ struct PostService {
             if hashtags != [] && mentions != [] {
                 let hashtagString = hashtags.joined(separator: " ")
                 let mentionString = mentions.joined(separator: " ")
-                dictToUpload = ["caption": caption, "imageURL": imageURL, "timestamp": timestamp, "likes": 0, "userID": user.userID!, "username": user.username!, "hashtags": hashtagString, "mentions": mentionString]
+                dictToUpload = ["caption": caption, "imageURL": imageURL, "timestamp": timestamp, "likes": 0, "userID": profile.userID!, "username": profile.username!, "hashtags": hashtagString, "mentions": mentionString]
             } else if hashtags != [] {
                 let hashtagString = hashtags.joined(separator: " ")
-                dictToUpload = ["caption": caption, "imageURL": imageURL, "timestamp": timestamp, "likes": 0, "userID": user.userID!, "username": user.username!, "hashtags": hashtagString]
+                dictToUpload = ["caption": caption, "imageURL": imageURL, "timestamp": timestamp, "likes": 0, "userID": profile.userID!, "username": profile.username!, "hashtags": hashtagString]
             } else if mentions != [] {
                 let mentionString = mentions.joined(separator: " ")
-                dictToUpload = ["caption": caption, "imageURL": imageURL, "timestamp": timestamp, "likes": 0, "userID": user.userID!, "username": user.username!, "mentions": mentionString]
+                dictToUpload = ["caption": caption, "imageURL": imageURL, "timestamp": timestamp, "likes": 0, "userID": profile.userID!, "username": profile.username!, "mentions": mentionString]
             } else {
-                dictToUpload = ["caption": caption, "imageURL": imageURL, "timestamp": timestamp, "likes": 0, "userID": user.userID!, "username": user.username!]
+                dictToUpload = ["caption": caption, "imageURL": imageURL, "timestamp": timestamp, "likes": 0, "userID": profile.userID!, "username": profile.username!]
             }
         } else {
-            dictToUpload = ["imageURL": imageURL, "timestamp": timestamp, "likes": 0, "userID": user.userID!, "username": user.username!]
+            dictToUpload = ["imageURL": imageURL, "timestamp": timestamp, "likes": 0, "userID": profile.userID!, "username": profile.username!]
         }
         
         print("DICT \(dictToUpload)")
         
-        let userData = databaseRef.child("Posts/\(user.userID!)/\(key)")
+        let userData = databaseRef.child("Posts/\(profile.userID!)/\(key)")
         
         userData.setValue(dictToUpload) { (error, reference) in
             if let error = error as? NSError {
@@ -102,16 +102,16 @@ struct PostService {
     
     typealias PostsReceived = ([Post]) -> Void
     
-    func fetchPosts(user: FIRUser, completion: @escaping PostsReceived) {
+    func fetchPosts(user: User, completion: @escaping PostsReceived) {
         let postData = databaseRef.child("Posts/\(user.uid)/")
         
         postData.observeSingleEvent(of: .value, with: { (snapshot) in
             var posts: [Post] = []
             for children in snapshot.children {
-                let childSnap = children as! FIRDataSnapshot
+                let childSnap = children as! DataSnapshot
                 let childSnapDict = childSnap.value as! NSDictionary
                 if childSnapDict["userID"] != nil {
-                    let post = Post(snapshot: children as! FIRDataSnapshot)
+                    let post = Post(snapshot: children as! DataSnapshot)
                     posts.append(post)
                 }
             }
@@ -125,10 +125,10 @@ struct PostService {
         postData.observeSingleEvent(of: .value, with: { (snapshot) in
             var posts: [Post] = []
             for children in snapshot.children {
-                let childSnap = children as! FIRDataSnapshot
+                let childSnap = children as! DataSnapshot
                 let childSnapDict = childSnap.value as! NSDictionary
                 if childSnapDict["userID"] != nil {
-                    let post = Post(snapshot: children as! FIRDataSnapshot)
+                    let post = Post(snapshot: children as! DataSnapshot)
                     posts.append(post)
                 }
             }
@@ -142,22 +142,19 @@ struct PostService {
         
         postData.queryOrdered(byChild: "timestamp").observeSingleEvent(of: .value, with: { snapshot in
             for child in snapshot.children {
-                let snap = child as! FIRDataSnapshot
+                let snap = child as! DataSnapshot
                 
                 for children in snap.children {
                     print("User Child: \(children)")
-                    let childSnap = children as! FIRDataSnapshot
+                    let childSnap = children as! DataSnapshot
                     let childSnapDict = childSnap.value as! NSDictionary
                     if childSnapDict["userID"] != nil {
-                        let post = Post(snapshot: children as! FIRDataSnapshot)
-                        print("User Post: \(post)")
+                        let post = Post(snapshot: children as! DataSnapshot)
                         posts.append(post)
-                        print("User Sent")
                     }
                 }
             }
             
-            print("User Completion")
             completion(posts)
         })
         
@@ -169,39 +166,36 @@ struct PostService {
         
         postData.observeSingleEvent(of: .value, with: { snapshot in
             for child in snapshot.children {
-                let snap = child as! FIRDataSnapshot
+                let snap = child as! DataSnapshot
                 
                 for children in snap.children {
                     print("User Child: \(children)")
-                    let childSnap = children as! FIRDataSnapshot
+                    let childSnap = children as! DataSnapshot
                     let childSnapDict = childSnap.value as! NSDictionary
                     if childSnapDict["userID"] != nil {
-                        let post = Post(snapshot: children as! FIRDataSnapshot)
-                        print("User Post: \(post)")
+                        let post = Post(snapshot: children as! DataSnapshot)
                         posts.append(post)
-                        print("User Sent")
                     }
                 }
             }
             
-            print("User Completion")
             completion(posts)
         })
     }
     
-    typealias UserFound = (User) -> Void
+    typealias ProfileFound = (Profile) -> Void
     
-    func userFromId(id: String, completion: @escaping UserFound) {
+    func userFromId(id: String, completion: @escaping ProfileFound) {
         let userData = databaseRef.child("Users/\(id)/")
         
         userData.observeSingleEvent(of: .value, with: { snapshot in
-            let capturedUser = User(snapshot: snapshot)
-            completion(capturedUser)
+            let capturedProfile = Profile(snapshot: snapshot)
+            completion(capturedProfile)
         })
     }
     
     func likePost(post: Post, completion: @escaping PostLikes) {
-        let currentUser = FIRAuth.auth()?.currentUser
+        let currentUser = Auth.auth().currentUser
         let likeTimestamp = Date().timeIntervalSince1970
         let likeDict = ["userID": currentUser!.uid, "timestamp": likeTimestamp] as [String : Any]
         let userData = databaseRef.child("Posts/\(post.userID!)/\(post.key)/likers/\(currentUser!.uid)")
@@ -241,7 +235,7 @@ struct PostService {
     }
     
     func dislikePost(post: Post, completion: @escaping PostLikes) {
-        let currentUser = FIRAuth.auth()?.currentUser
+        let currentUser = Auth.auth().currentUser
         let postData = databaseRef.child("Posts/\(post.userID!)/\(post.key)/likers/")
         
         postData.child("\(currentUser!.uid)").removeValue { (error, reference) in
@@ -257,7 +251,7 @@ struct PostService {
     typealias PostLiked = (Bool) -> Void
     
     func isPostLiked(post: Post, completion: @escaping PostLiked) {
-        let currentUser = FIRAuth.auth()?.currentUser
+        let currentUser = Auth.auth().currentUser
         let postData = databaseRef.child("Posts/\(post.userID!)/\(post.key)/likers/\(currentUser!.uid)")
         
         postData.observeSingleEvent(of: .value, with: { snapshot in
@@ -271,7 +265,7 @@ struct PostService {
     }
     
     func isPostSaved(post: Post, completion: @escaping PostLiked) {
-        let currentUser = FIRAuth.auth()?.currentUser
+        let currentUser = Auth.auth().currentUser
         let postData = databaseRef.child("Posts/\(post.userID!)/\(post.key)/usersWhoSaved/\(currentUser!.uid)/")
         
         postData.observeSingleEvent(of: .value, with: { snapshot in
@@ -283,7 +277,7 @@ struct PostService {
         })
     }
     
-    func postComment(post: Post, comment: String, user: FIRUser, completion: @escaping (FIRDatabaseReference) -> Void) {
+    func postComment(post: Post, comment: String, user: User, completion: @escaping (DatabaseReference) -> Void) {
         let postTimestamp = Date().timeIntervalSince1970
         var commentDict: [String: Any] = ["timestamp": postTimestamp, "userID": "\(user.uid)", "comment": comment]
         
@@ -327,7 +321,7 @@ struct PostService {
         }
     }
     
-    func deleteCaption(post: Post, completion: @escaping (FIRDatabaseReference) -> Void) {
+    func deleteCaption(post: Post, completion: @escaping (DatabaseReference) -> Void) {
         let postData = databaseRef.child("Posts/\(post.userID!)/\(post.key)/caption")
         
         postData.removeValue { (error, reference) in
@@ -340,7 +334,7 @@ struct PostService {
         }
     }
     
-    func deleteComment(post: Post, comment: Comment, completion: @escaping (FIRDatabaseReference) -> Void) {
+    func deleteComment(post: Post, comment: Comment, completion: @escaping (DatabaseReference) -> Void) {
         let commentData = databaseRef.child("Posts/\(post.userID!)/\(post.key)/comments/\(comment.key)/")
         
         commentData.removeValue { (error, reference) in
@@ -355,11 +349,12 @@ struct PostService {
     
     typealias ReturnImage = (UIImage) -> Void
     func retrievePostPicture(imageURL: String, completion: @escaping ReturnImage) {
-        var storageRef: FIRStorage {
-            return FIRStorage.storage()
+        
+        var storageRef: Storage {
+            return Storage.storage()
         }
         
-        storageRef.reference(forURL: imageURL).data(withMaxSize: 5 * 1024 * 1024) { (imgData, error) in
+        storageRef.reference(forURL: imageURL).getData(maxSize: 5 * 1024 * 1024) { (imgData, error) in
             if error == nil {
                 if let image = imgData {
                     DispatchQueue.main.async {                        
@@ -376,15 +371,15 @@ struct PostService {
     func retrieveProfilePicture(userID: String, completion: @escaping ReturnImage) {
         let userData = databaseRef.child("Users/\(userID)/")
         
-        var storageRef: FIRStorage {
-            return FIRStorage.storage()
+        var storageRef: Storage {
+            return Storage.storage()
         }
         
         userData.observeSingleEvent(of: .value, with: { snapshot in
-            let user = User(snapshot: snapshot)
+            let profile = Profile(snapshot: snapshot)
             
-            if let profilePic = user.photoURL {
-                storageRef.reference(forURL: profilePic).data(withMaxSize: 5 * 1024 * 1024, completion: { (imgData, error) in
+            if let profilePic = profile.photoURL {
+                storageRef.reference(forURL: profilePic).getData(maxSize: 5 * 1024 * 1024, completion: { (imgData, error) in
                     if error == nil {
                         if let image = imgData {
                             DispatchQueue.main.async {
@@ -404,7 +399,7 @@ struct PostService {
     }
     
     typealias ReturnUserIDs = ([String]) -> Void
-    typealias ReturnLikers = ([User]) -> Void
+    typealias ReturnLikers = ([Profile]) -> Void
     
     func fetchPostLikers(post: Post, completion: @escaping ReturnUserIDs) {
         let postData = databaseRef.child("Posts/\(post.userID!)/\(post.key)/likers/")
@@ -425,15 +420,15 @@ struct PostService {
     
     func fetchPostLikes(post: Post, completion: @escaping ReturnLikers) {
         fetchPostLikers(post: post) { (userIDs) in
-            var users: [User] = []
+            var profiles: [Profile] = []
             var loopCount = 0
             for id in userIDs {
-                self.userFromId(id: id, completion: { (user) in
+                self.userFromId(id: id, completion: { (profile) in
                     loopCount = loopCount + 1
-                    users.append(user)
+                    profiles.append(profile)
                     
                     if loopCount == userIDs.count {
-                        completion(users)
+                        completion(profiles)
                     }
                 })
             }
@@ -448,26 +443,26 @@ struct PostService {
         userData.observeSingleEvent(of: .value, with: { (snapshot) in
             var comments: [Comment] = []
             for children in snapshot.children {
-                let comment = Comment(snapshot: children as! FIRDataSnapshot)
+                let comment = Comment(snapshot: children as! DataSnapshot)
                 comments.append(comment)
             }
             completion(comments)
         })
     }
     
-    func fetchUser(user: FIRUser, completion: @escaping UserFound) {
+    func fetchUser(user: User, completion: @escaping ProfileFound) {
         let userData = databaseRef.child("Users/\(user.uid)")
         userData.observeSingleEvent(of: .value, with: { snapshot in
-            let user = User(snapshot: snapshot)
-            completion(user)
+            let profile = Profile(snapshot: snapshot)
+            completion(profile)
         })
     }
     
-    func fetchUserAlot(user: FIRUser, completion: @escaping UserFound) {
+    func fetchUserAlot(user: User, completion: @escaping ProfileFound) {
         let userData = databaseRef.child("Users/\(user.uid)")
         userData.observe(.value, with: { snapshot in
-            let user = User(snapshot: snapshot)
-            completion(user)
+            let profile = Profile(snapshot: snapshot)
+            completion(profile)
         })
     }
     
@@ -482,7 +477,7 @@ struct PostService {
         })
     }
     
-    func savePost(post: Post, currentUser: FIRUser, completion: @escaping PostUploaded) {
+    func savePost(post: Post, currentUser: User, completion: @escaping PostUploaded) {
         let userDict = ["userID": currentUser.uid]
         let savedDict = ["key": post.key, "userID": post.userID!]
         let postData = databaseRef.child("Posts/\(post.userID!)/\(post.key)/usersWhoSaved/\(currentUser.uid)")
@@ -498,7 +493,7 @@ struct PostService {
         }
     }
     
-    func unSavePost(post: Post, currentUser: FIRUser, completion: @escaping PostUploaded) {
+    func unSavePost(post: Post, currentUser: User, completion: @escaping PostUploaded) {
         let postData = databaseRef.child("Posts/\(post.userID!)/\(post.key)/usersWhoSaved/\(currentUser.uid)")
         let savedData = databaseRef.child("Users/\(currentUser.uid)/savedPosts/\(post.userID!)/\(post.key)")
 
@@ -514,7 +509,7 @@ struct PostService {
     }
     
     typealias SavedPostsReceived = ([Post]) -> Void
-    func usersSavedPosts(currentUser: FIRUser, completion: @escaping SavedPostsReceived) {
+    func usersSavedPosts(currentUser: User, completion: @escaping SavedPostsReceived) {
         let savedPostsData = databaseRef.child("Users/\(currentUser.uid)/savedPosts/")
         
         savedPostsData.observeSingleEvent(of: .value, with: { snapshot in
@@ -522,10 +517,8 @@ struct PostService {
             var loopCount = 0
             
             for children in snapshot.children {
-                print("snapshot value: \(children as! FIRDataSnapshot)")
-                let childSnap = children as! FIRDataSnapshot
+                let childSnap = children as! DataSnapshot
                 let childSnapDict = childSnap.value as! [String: Any]
-                print("Child Dict: \(childSnapDict)")
                 for (_, value) in childSnapDict {
                     let dataDict = value as! [String: Any]
                     if let userID = dataDict["userID"] as? String, let key = dataDict["key"] as? String {
@@ -550,13 +543,13 @@ struct PostService {
             
             for child in snapshot.children {
                 loopCount = loopCount + 1
-                let snap = child as! FIRDataSnapshot
+                let snap = child as! DataSnapshot
                 
                 for children in snap.children {
-                    let childSnap = children as! FIRDataSnapshot
+                    let childSnap = children as! DataSnapshot
                     let childSnapDict = childSnap.value as! NSDictionary
                     if childSnapDict["userID"] != nil {
-                        let post = Post(snapshot: children as! FIRDataSnapshot)
+                        let post = Post(snapshot: children as! DataSnapshot)
                         if let mentions = post.mentions {
                             if mentions.contains("@\(username)") && mentions.characters.count == username.characters.count + 1 {
                                 print("TRUE")
@@ -598,20 +591,18 @@ struct PostService {
         var posts: [Post] = []
         
         postData.observeSingleEvent(of: .value, with: { snapshot in
-            var childLoopCount = Int(snapshot.childrenCount)
+            let childLoopCount = Int(snapshot.childrenCount)
             var loopCount = 0
             
             for child in snapshot.children {
                 loopCount = loopCount + 1
-                print("CHild: \(child)")
-                let snap = child as! FIRDataSnapshot
+                let snap = child as! DataSnapshot
                 
                 for children in snap.children {
-                    print("User Child: \(children)")
-                    let childSnap = children as! FIRDataSnapshot
+                    let childSnap = children as! DataSnapshot
                     let childSnapDict = childSnap.value as! NSDictionary
                     if childSnapDict["userID"] != nil {
-                        let post = Post(snapshot: children as! FIRDataSnapshot)
+                        let post = Post(snapshot: children as! DataSnapshot)
                         if let hashtags = post.hashtags {
                             if hashtags.contains(hashtag) {
                                 print("Appened Post")
@@ -622,14 +613,13 @@ struct PostService {
                 }
                 
                 if loopCount == childLoopCount {
-                    print("Complete")
                     completion(posts)
                 }
             }
         })
     }
     
-    typealias PostDeletion = (FIRDatabaseReference) -> Void
+    typealias PostDeletion = (DatabaseReference) -> Void
     
     func deletePost(post: Post, completion: @escaping PostDeletion) {
         let postData = databaseRef.child("Posts/\(post.userID!)/\(post.key)/")

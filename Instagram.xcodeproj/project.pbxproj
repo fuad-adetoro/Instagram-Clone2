@@ -52,7 +52,7 @@
 		187E08D61EA508FB004F5907 /* StringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187E08CD1EA508FB004F5907 /* StringExtension.swift */; };
 		187E08D71EA508FB004F5907 /* UIButtonExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187E08CE1EA508FB004F5907 /* UIButtonExtension.swift */; };
 		187E08D81EA508FB004F5907 /* UIImageExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187E08CF1EA508FB004F5907 /* UIImageExtension.swift */; };
-		187E08D91EA508FB004F5907 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187E08D01EA508FB004F5907 /* User.swift */; };
+		187E08D91EA508FB004F5907 /* Profile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187E08D01EA508FB004F5907 /* Profile.swift */; };
 		187E08DB1EA5179E004F5907 /* Post.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187E08DA1EA5179E004F5907 /* Post.swift */; };
 		187E08DD1EA517BE004F5907 /* DateExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187E08DC1EA517BE004F5907 /* DateExtension.swift */; };
 		187E08DF1EA5182F004F5907 /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187E08DE1EA5182F004F5907 /* HomeViewController.swift */; };
@@ -134,7 +134,7 @@
 		187E08CD1EA508FB004F5907 /* StringExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StringExtension.swift; sourceTree = "<group>"; };
 		187E08CE1EA508FB004F5907 /* UIButtonExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIButtonExtension.swift; sourceTree = "<group>"; };
 		187E08CF1EA508FB004F5907 /* UIImageExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIImageExtension.swift; sourceTree = "<group>"; };
-		187E08D01EA508FB004F5907 /* User.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		187E08D01EA508FB004F5907 /* Profile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Profile.swift; sourceTree = "<group>"; };
 		187E08DA1EA5179E004F5907 /* Post.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Post.swift; sourceTree = "<group>"; };
 		187E08DC1EA517BE004F5907 /* DateExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DateExtension.swift; sourceTree = "<group>"; };
 		187E08DE1EA5182F004F5907 /* HomeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = HomeViewController.swift; sourceTree = "<group>"; };
@@ -283,7 +283,7 @@
 				187E08CD1EA508FB004F5907 /* StringExtension.swift */,
 				187E08CE1EA508FB004F5907 /* UIButtonExtension.swift */,
 				187E08CF1EA508FB004F5907 /* UIImageExtension.swift */,
-				187E08D01EA508FB004F5907 /* User.swift */,
+				187E08D01EA508FB004F5907 /* Profile.swift */,
 				0639C10F1ED374700061D68D /* ProfileActivity.swift */,
 				0639C1111ED39B580061D68D /* UserActivity.swift */,
 			);
@@ -637,7 +637,7 @@
 				183C177F1EABD15F00F6B833 /* ViewSavedPostsViewController.swift in Sources */,
 				187E08A01EA50802004F5907 /* SelectedPhotoViewController.swift in Sources */,
 				187E08C61EA50895004F5907 /* ProfileViewOneImageCellNib.swift in Sources */,
-				187E08D91EA508FB004F5907 /* User.swift in Sources */,
+				187E08D91EA508FB004F5907 /* Profile.swift in Sources */,
 				0639C1101ED374700061D68D /* ProfileActivity.swift in Sources */,
 				187E08A21EA50802004F5907 /* EditProfileViewController.swift in Sources */,
 				1863ABBB1EA7CBBE00BE5576 /* ViewUserProfileViewController.swift in Sources */,

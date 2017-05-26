@@ -20,7 +20,7 @@ class CommentsViewController: UIViewController {
     @IBOutlet weak var commentTextField: UITextField!
     
     var post: Post!
-    let currentUser = FIRAuth.auth()?.currentUser
+    let currentUser = Auth.auth().currentUser
     var comments: [Comment] = []
     
     @IBOutlet weak var postOutlet: UIButton!
@@ -110,10 +110,10 @@ class CommentsViewController: UIViewController {
     }
     
     func loadProfileWithUsername(username: String) {
-        accountService.fetchUserWithUsername(username: username) { (user) in
+        accountService.fetchUserWithUsername(username: username) { (profile) in
             let storyboard = UIStoryboard(name: "Main", bundle: nil)
             let profileVC = storyboard.instantiateViewController(withIdentifier: "ViewUserProfile") as! ViewUserProfileViewController
-            profileVC.user = user
+            profileVC.profile = profile
             self.navigationController?.pushViewController(profileVC, animated: true)
         }
     }
@@ -180,14 +180,14 @@ extension CommentsViewController: UITableViewDataSource {
             captionTextView.text = "\(self.post.caption!)"
             captionTextView.sizeToFit()
             
-            authService.userFromId(id: post.userID!, completion: { (user) in
-                let username = user.username!
+            authService.userFromId(id: post.userID!, completion: { (profile) in
+                let username = profile.username!
                 let caption = self.post.caption!
                 captionTextView.text = "\(username) \(caption)"
                 captionTextView.resolveHashTags()
                 captionTextView.sizeToFit()
                 captionTextView.delegate = self
-                if let photoURL = user.photoURL, let url = URL(string: photoURL) {
+                if let photoURL = profile.photoURL, let url = URL(string: photoURL) {
                     self.downloadTask = profilePicture.loadImage(url: url)
                 }
             })
@@ -213,15 +213,15 @@ extension CommentsViewController: UITableViewDataSource {
             let timeLabel = cell.viewWithTag(503) as! UILabel
             timeLabel.text = date.timeSinceComment()
             
-            authService.userFromId(id: comment.userID!, completion: { (user) in
-                let username = user.username!
+            authService.userFromId(id: comment.userID!, completion: { (profile) in
+                let username = profile.username!
                 let message = comment.comment!
                 
                 messageView.text = "\(username) \(message)"
                 messageView.sizeToFit()
                 messageView.resolveHashTags()
                 
-                if let photoURL = user.photoURL, let url = URL(string: photoURL) {
+                if let photoURL = profile.photoURL, let url = URL(string: photoURL) {
                     self.downloadTask = profilePicture.loadImage(url: url)
                 }
             })

@@ -19,7 +19,7 @@ struct UserActivity {
     var timestamp: TimeInterval
     var userID: String
     var activityType: ActivityType
-    var user: User?
+    var profile: Profile?
     var postReference: Post?
     
     init(timestamp: TimeInterval, userID: String, activityType: ActivityType, postReference: Post?) {

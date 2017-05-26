@@ -28,8 +28,8 @@ class ProfileCellNib: UICollectionViewCell {
     
     let authService = AuthService()
     let accountService = AccountService()
-    var user: User?
-    var currentUser: FIRUser?
+    var profile: Profile?
+    var currentUser: User?
     
     var collectionViewHeight: CGFloat?
     
@@ -43,7 +43,7 @@ class ProfileCellNib: UICollectionViewCell {
         updateViewLayout()
     }
     
-    func updateUserPicture(user: FIRUser, image: UIImage) {
+    func updateUserPicture(user: User, image: UIImage) {
         authService.updateProfilePhoto(user: user, picture: image)
     }
     
@@ -53,8 +53,8 @@ class ProfileCellNib: UICollectionViewCell {
     
     var followingUser = false
     
-    func interactiveButton(user: User, currentUser: FIRUser){
-        let userData = FIRDatabase.database().reference(withPath: "Users/\(currentUser.uid)/following/\(user.userID!)")
+    func interactiveButton(profile: Profile, currentUser: User){
+        let userData = Database.database().reference(withPath: "Users/\(currentUser.uid)/following/\(profile.userID!)")
         
         userData.observeSingleEvent(of: .value, with: { snapshot in
             if snapshot.exists() {
@@ -73,23 +73,23 @@ class ProfileCellNib: UICollectionViewCell {
         })
     }
     
-    func updateActivityCount(user: User) {
-        var databaseRef: FIRDatabaseReference {
-            return FIRDatabase.database().reference()
+    func updateActivityCount(profile: Profile) {
+        var databaseRef: DatabaseReference {
+            return Database.database().reference()
         }
         
-        let userData = databaseRef.child("Users/\(user.userID!)/")
+        let userData = databaseRef.child("Users/\(profile.userID!)/")
         
         userData.observeSingleEvent(of: .value, with: { snapshot in
-            let user = User(snapshot: snapshot)
+            let profile = Profile(snapshot: snapshot)
             
-            if let following = user.following {
+            if let following = profile.following {
                 self.followingCountLabel.text = "\(following.count)"
             } else {
                 self.followingCountLabel.text = "0"
             }
             
-            if let followers = user.followers {
+            if let followers = profile.followers {
                 self.followersCountLabel.text = "\(followers.count)"
             } else {
                 self.followersCountLabel.text = "0"
@@ -98,20 +98,20 @@ class ProfileCellNib: UICollectionViewCell {
     }
     
     func followUser() {
-        if user != nil, currentUser != nil {
-            accountService.followUser(userID: user!.userID!, currentUser: currentUser!)
-            interactiveButton(user: user!, currentUser: currentUser!)
+        if profile != nil, currentUser != nil {
+            accountService.followUser(userID: profile!.userID!, currentUser: currentUser!)
+            interactiveButton(profile: profile!, currentUser: currentUser!)
             followingUser = true
-            updateActivityCount(user: user!)
+            updateActivityCount(profile: profile!)
         }
     }
     
     func unFollowUser() {
-        if user != nil, currentUser != nil {
-            accountService.unFollowUser(userID: user!.userID!, currentUser: currentUser!)
-            interactiveButton(user: user!, currentUser: currentUser!)
+        if profile != nil, currentUser != nil {
+            accountService.unFollowUser(userID: profile!.userID!, currentUser: currentUser!)
+            interactiveButton(profile: profile!, currentUser: currentUser!)
             followingUser = false
-            updateActivityCount(user: user!)
+            updateActivityCount(profile: profile!)
         }
     }
     
@@ -132,24 +132,24 @@ class ProfileCellNib: UICollectionViewCell {
         self.updateConstraints()
     }
     
-    func configure(user: User) {
-        self.user = user
-        let currentUser = FIRAuth.auth()?.currentUser
+    func configure(profile: Profile) {
+        self.profile = profile
+        let currentUser = Auth.auth().currentUser
         self.currentUser = currentUser!
         
-        if let following = user.following {
+        if let following = profile.following {
             self.followingCountLabel.text = "\(following.count)"
         } else {
             self.followingCountLabel.text = "0"
         }
         
-        if let followers = user.followers {
+        if let followers = profile.followers {
             self.followersCountLabel.text = "\(followers.count)"
         } else {
             self.followersCountLabel.text = "0"
         }
         
-        if let displayName = user.name {
+        if let displayName = profile.name {
             self.displayNameLabel.text = displayName
             self.displayNameLabel.sizeToFit()
             self.updateConstraints()
@@ -157,20 +157,19 @@ class ProfileCellNib: UICollectionViewCell {
             self.displayNameLabel.text = ""
         }
         
-        if let bio = user.biograph {
+        if let bio = profile.biograph {
             self.biographLabel.text = bio
             self.biographLabel.sizeToFit()
         } else {
             self.biographLabel.text = ""
         }
         
-        if let profilePicture = user.photoURL {
-            var storageRef: FIRStorage {
-                return FIRStorage.storage()
+        if let profilePicture = profile.photoURL {
+            var storageRef: Storage {
+                return Storage.storage()
             }
             
-            storageRef.reference(forURL: profilePicture).data(withMaxSize: 5 * 1024 * 1024) { (imgData, error) in
-                
+            storageRef.reference(forURL: profilePicture).getData(maxSize: 5 * 1024 * 1024, completion: { (imgData, error) in
                 if error == nil {
                     DispatchQueue.main.async {
                         if let data = imgData {
@@ -180,7 +179,7 @@ class ProfileCellNib: UICollectionViewCell {
                 } else {
                     print(error?.localizedDescription)
                 }
-            }
+            })
         } else {
             self.profilePicture.image = #imageLiteral(resourceName: "user-placeholder.jpg")
         }

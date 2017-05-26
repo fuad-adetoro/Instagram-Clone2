@@ -13,7 +13,7 @@ struct SavedPosts {
     var key: String!
     var userID: String!
     
-    init(snapshot: FIRDataSnapshot) {
+    init(snapshot: DataSnapshot) {
         key = (snapshot.value as! NSDictionary)["key"] as! String
         userID = (snapshot.value as! NSDictionary)["userID"] as! String
     }

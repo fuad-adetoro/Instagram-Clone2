@@ -17,7 +17,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UITabBarControllerDelegat
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         
-        FIRApp.configure()
+        FirebaseApp.configure()
         
         logUser()
         
@@ -39,7 +39,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UITabBarControllerDelegat
     
     func logUser() {
         // Check if current user isn't nil, i.e. user exists.
-        let user = FIRAuth.auth()?.currentUser
+        let user = Auth.auth().currentUser
         if user != nil {
             let tabBar = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "LoggedInMainTabBar") as! UITabBarController
             self.window?.rootViewController = tabBar

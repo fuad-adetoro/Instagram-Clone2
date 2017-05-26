@@ -14,9 +14,9 @@ class Comment {
     var timestamp: TimeInterval!
     var userID: String!
     var key: String
-    var ref: FIRDatabaseReference
+    var ref: DatabaseReference
     
-    init(snapshot: FIRDataSnapshot) {
+    init(snapshot: DataSnapshot) {
         key = snapshot.key
         ref = snapshot.ref
         comment = (snapshot.value as! NSDictionary)["comment"] as! String

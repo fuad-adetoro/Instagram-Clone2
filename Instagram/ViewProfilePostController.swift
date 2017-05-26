@@ -12,8 +12,8 @@ import Firebase
 class ViewProfilePostController: UIViewController {
 
     var post: Post?
-    var user: User?
-    let currentUser = FIRAuth.auth()?.currentUser
+    var profile: Profile?
+    let currentUser = Auth.auth().currentUser
     let postService = PostService()
     let accountService = AccountService()
     
@@ -62,10 +62,10 @@ class ViewProfilePostController: UIViewController {
     }
     
     func loadProfileWithUsername(username: String) {
-        accountService.fetchUserWithUsername(username: username) { (user) in
+        accountService.fetchUserWithUsername(username: username) { (profile) in
             let storyboard = UIStoryboard(name: "Main", bundle: nil)
             let profileVC = storyboard.instantiateViewController(withIdentifier: "ViewUserProfile") as! ViewUserProfileViewController
-            profileVC.user = user
+            profileVC.profile = profile
             self.navigationController?.pushViewController(profileVC, animated: true)
         }
     }
@@ -81,13 +81,13 @@ class ViewProfilePostController: UIViewController {
     }
     
     func displayLikesController(_ sender: UITapGestureRecognizer) {
-        postService.fetchPostLikes(post: post!, completion: { (users) in
-            if !users.isEmpty {
+        postService.fetchPostLikes(post: post!, completion: { (profiles) in
+            if !profiles.isEmpty {
                 let storyboard = UIStoryboard(name: "Main", bundle: nil)
                 let activityVC = storyboard.instantiateViewController(withIdentifier: "ActivityControl") as! ActivityViewController
-                activityVC.users = users
+                activityVC.profiles = profiles
                 activityVC.activity = .likes
-                activityVC.user = self.user!
+                activityVC.profile = self.profile!
                 self.navigationController?.pushViewController(activityVC, animated: true)
             }
         })
@@ -148,7 +148,7 @@ extension ViewProfilePostController: UICollectionViewDataSource {
             let commentsButton = cell.viewWithTag(2005) as! UIButton
             commentsButton.addTarget(self, action: #selector(ViewProfilePostController.goToComments), for: .touchUpInside)
             
-            let username = user!.username!
+            let username = profile!.username!
             
             cell.captionTextView.text = "\(username) \(caption)"
             cell.captionTextView.resolveHashTags()
@@ -194,7 +194,7 @@ extension ViewProfilePostController: UICollectionViewDataSource {
         let postObject = postCellCaptionNib.object(at: 0) as! PostCellWithCaption
         
         if post!.caption != nil {
-            postObject.configure(username: user!.username!, caption: post!.caption!)
+            postObject.configure(username: profile!.username!, caption: post!.caption!)
             let newHeight = postObject.preferredLayoutSizeFittingSize(targetSize: CGSize(width: self.view.frame.width, height: 0)).height
             if newHeight == 0 {
                 return CGSize(width: self.view.frame.width, height: 470)

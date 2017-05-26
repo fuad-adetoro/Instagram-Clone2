@@ -14,7 +14,7 @@ struct Post {
     var timestamp: TimeInterval!
     var caption: String?
     var key: String
-    var ref: FIRDatabaseReference
+    var ref: DatabaseReference
     var likes: Int!
     var userID: String!
     var username: String!
@@ -22,7 +22,7 @@ struct Post {
     var mentions: String?
     var likers: [String: Any]?
     
-    init(snapshot: FIRDataSnapshot) {
+    init(snapshot: DataSnapshot) {
         key = snapshot.key
         ref = snapshot.ref
         imageURL = (snapshot.value as! NSDictionary)["imageURL"] as! String

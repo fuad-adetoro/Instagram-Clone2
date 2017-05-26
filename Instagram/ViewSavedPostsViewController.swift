@@ -16,7 +16,7 @@ class ViewSavedPostsViewController: UIViewController {
     var posts: [Post] = []
     var savedPosts: [SavedPosts] = []
     let postService = PostService()
-    var currentUser: FIRUser?
+    var currentUser: User?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -68,9 +68,9 @@ class ViewSavedPostsViewController: UIViewController {
             let picturePostVC = segue.destination as! ViewProfilePostController
             let dataDict = sender as! [String: Any]
             let post = dataDict["post"] as! Post
-            let user = dataDict["user"] as! User
+            let profile = dataDict["profile"] as! Profile
             picturePostVC.post = post
-            picturePostVC.user = user
+            picturePostVC.profile = profile
         }
     }
     
@@ -128,8 +128,8 @@ extension ViewSavedPostsViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if indexPath.section == 1 {
             let post = posts[indexPath.row]
-            postService.userFromId(id: post.userID!, completion: { (user) in
-                let dataDict: [String: Any] = ["user": user, "post": post]
+            postService.userFromId(id: post.userID!, completion: { (profile) in
+                let dataDict: [String: Any] = ["profile": profile, "post": post]
                 self.goToPicture(dataDict: dataDict)
             })
         }
